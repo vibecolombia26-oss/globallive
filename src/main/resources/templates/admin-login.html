@@ -3,79 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - VIBE COLOMBIA 26</title>
+    <title>Admin - GlobalLive</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #0a0a0a;
-            color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .bg-grid {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image:
-                    linear-gradient(rgba(255,0,255,0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
+            color: #fff; font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .login-container {
-            position: relative; z-index: 1;
-            background: rgba(20,20,20,0.9);
-            border: 2px solid #ff00ff;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 0 40px rgba(255,0,255,0.3);
-            backdrop-filter: blur(10px);
-            width: 400px;
-            text-align: center;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; padding: 40px; width: 400px; text-align: center;
         }
-        h1 {
-            font-size: 2rem;
-            background: linear-gradient(45deg, #ff00ff, #00ffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-        }
-        .subtitle { color: #00ffff; font-size: 0.9rem; margin-bottom: 30px; }
+        h1 { font-size: 1.8rem; font-weight: 300; color: #4CAF50; letter-spacing: 4px; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 3px; }
         input {
             width: 100%; padding: 15px; margin: 10px 0;
-            background: #111; border: 2px solid #333;
-            border-radius: 10px; color: #fff; font-size: 1rem;
-            transition: all 0.3s;
+            background: #111; border: 1px solid #333; border-radius: 6px;
+            color: #fff; font-size: 0.95rem; transition: all 0.3s;
         }
-        input:focus {
-            outline: none; border-color: #ff00ff;
-            box-shadow: 0 0 20px rgba(255,0,255,0.3);
-        }
+        input:focus { outline: none; border-color: #4CAF50; }
         button {
             width: 100%; padding: 15px; margin-top: 15px;
-            background: linear-gradient(45deg, #ff00ff, #cc00cc);
-            color: #fff; font-size: 1.1rem; font-weight: 700;
-            border: none; border-radius: 10px; cursor: pointer;
-            transition: all 0.3s; text-transform: uppercase;
+            background: #4CAF50; color: #000; font-size: 0.95rem; font-weight: 600;
+            border: none; border-radius: 25px; cursor: pointer;
+            transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px;
         }
-        button:hover {
-            box-shadow: 0 0 30px rgba(255,0,255,0.6);
-            transform: scale(1.02);
-        }
-        .error { color: #ff4444; margin-top: 15px; }
+        button:hover { box-shadow: 0 0 30px rgba(76,175,80,0.4); }
+        .error { color: #ff4444; margin-top: 15px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
-<div class="bg-grid"></div>
 <div class="login-container">
-    <h1>🔒 ADMIN</h1>
-    <p class="subtitle">VIBE COLOMBIA 26</p>
+    <h1>GlobalLive</h1>
+    <p class="subtitle">Panel Administrativo</p>
     <form method="post" action="/admin/login">
         <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Entrar</button>
+        <button type="submit">Ingresar</button>
         <div class="error" th:if="${error}" th:text="${error}"></div>
     </form>
 </div>
