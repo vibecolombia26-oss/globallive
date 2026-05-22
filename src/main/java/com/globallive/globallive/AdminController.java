@@ -16,8 +16,7 @@ public class AdminController {
 
     private final ProductoRepository productoRepository;
 
-    @Value("${admin.password}")
-    private String adminPassword;
+    private String adminPassword = "GlobalLive2026*";
 
     public AdminController(ProductoRepository productoRepository) {
         this.productoRepository = productoRepository;
