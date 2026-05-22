@@ -1,47 +1,101 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - GlobalLive</title>
+    <title>Panel Admin - GlobalLive</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
-            color: #fff; font-family: 'Segoe UI', system-ui, sans-serif;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
         }
-        .login-container {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px; padding: 40px; width: 400px; text-align: center;
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px; margin-bottom: 30px;
+            padding: 20px; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 16px;
         }
-        h1 { font-size: 1.8rem; font-weight: 300; color: #4CAF50; letter-spacing: 4px; margin-bottom: 10px; }
-        .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 3px; }
-        input {
-            width: 100%; padding: 15px; margin: 10px 0;
-            background: #111; border: 1px solid #333; border-radius: 6px;
-            color: #fff; font-size: 0.95rem; transition: all 0.3s;
+        .header h1 { font-size: 1.5rem; font-weight: 300; color: #4CAF50; letter-spacing: 3px; }
+        .btn {
+            padding: 10px 24px; border-radius: 25px; text-decoration: none;
+            font-weight: 500; transition: all 0.3s; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        input:focus { outline: none; border-color: #4CAF50; }
-        button {
-            width: 100%; padding: 15px; margin-top: 15px;
-            background: #4CAF50; color: #000; font-size: 0.95rem; font-weight: 600;
-            border: none; border-radius: 25px; cursor: pointer;
-            transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px;
+        .btn-agregar { background: #4CAF50; color: #000; }
+        .btn-agregar:hover { box-shadow: 0 0 20px rgba(76,175,80,0.4); }
+        .btn-ver { background: transparent; color: #fff; border: 1px solid #fff; }
+        .btn-ver:hover { background: #fff; color: #000; }
+        .mensaje {
+            background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.2);
+            padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #4CAF50;
         }
-        button:hover { box-shadow: 0 0 30px rgba(76,175,80,0.4); }
-        .error { color: #ff4444; margin-top: 15px; font-size: 0.85rem; }
+        table {
+            width: 100%; border-collapse: collapse;
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.06);
+        }
+        th {
+            background: rgba(76,175,80,0.05); padding: 15px;
+            color: #4CAF50; text-align: left; font-weight: 500;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
+        }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .acciones { display: flex; gap: 8px; }
+        .btn-editar {
+            background: #4CAF50; color: #000; padding: 8px 16px;
+            border-radius: 20px; text-decoration: none; font-size: 0.8rem;
+        }
+        .btn-eliminar {
+            background: transparent; color: #ff4444; padding: 8px 16px;
+            border-radius: 20px; text-decoration: none; font-size: 0.8rem;
+            border: 1px solid #ff4444;
+        }
+        .btn-eliminar:hover { background: #ff4444; color: #fff; }
+        .producto-img {
+            width: 50px; height: 50px; border-radius: 6px;
+            object-fit: cover; border: 1px solid rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
-<div class="login-container">
-    <h1>GlobalLive</h1>
-    <p class="subtitle">Panel Administrativo</p>
-    <form method="post" action="/admin/login">
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Ingresar</button>
-        <div class="error" th:if="${error}" th:text="${error}"></div>
-    </form>
+<div class="container">
+    <div class="header">
+        <h1>Panel Administrador</h1>
+        <div>
+            <a th:href="@{/admin/nuevo(key=${key})}" class="btn btn-agregar">+ Agregar Producto</a>
+            <a href="/" class="btn btn-ver" style="margin-left:10px;">Ver Tienda</a>
+        </div>
+    </div>
+    <div class="mensaje" th:if="${mensaje}" th:text="${mensaje}"></div>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>SKU</th><th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${productos}">
+            <td th:text="${p.id}">1</td>
+            <td>
+                <img class="producto-img" th:src="${p.imagen1}" th:alt="${p.nombre}" th:if="${p.imagen1 != null}">
+                <span th:if="${p.imagen1 == null}" style="color:#666;">-</span>
+            </td>
+            <td th:text="${p.nombre}">Nombre</td>
+            <td th:text="'$' + ${#numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}">$0</td>
+            <td th:text="${p.categoria}">Cat</td>
+            <td th:text="${p.sku}">SKU</td>
+            <td>
+                <div class="acciones">
+                    <a th:href="@{/admin/editar/{id}(id=${p.id}, key=${key})}" class="btn-editar">Editar</a>
+                    <a th:href="@{/admin/eliminar/{id}(id=${p.id}, key=${key})}" class="btn-eliminar" onclick="return confirm('¿Eliminar?')">Eliminar</a>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
