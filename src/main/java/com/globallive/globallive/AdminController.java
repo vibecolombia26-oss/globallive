@@ -1,53 +1,117 @@
-function completarOrden() {
-    const nombre = document.getElementById('nombreCliente').value;
-    const telefono = document.getElementById('telefono').value;
-    const email = document.getElementById('email').value;
-    const departamento = document.getElementById('departamento').value;
-    const ciudad = document.getElementById('ciudad').value;
-    const direccion = document.getElementById('direccion').value;
-    const notas = document.getElementById('notas').value;
+package com.globallive.globallive;
 
-    if (!nombre || !telefono || !departamento || !ciudad || !direccion) {
-        alert('Por favor completa todos los campos requeridos (*)');
-        return;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Base64;
+
+@Controller
+@RequestMapping("/admin")
+public class AdminController {
+
+    private final ProductoRepository productoRepository;
+    private final PedidoRepository pedidoRepository;
+    private String adminPassword = "GlobalLive2026*";
+
+    public AdminController(ProductoRepository productoRepository, PedidoRepository pedidoRepository) {
+        this.productoRepository = productoRepository;
+        this.pedidoRepository = pedidoRepository;
     }
 
-    let productosTexto = '';
-    let total = 0;
-    carrito.forEach(item => {
-        const precio = Number(item.precio) || 0;
-        const cantidad = Number(item.cantidad) || 1;
-        const subtotal = precio * cantidad;
-    total += subtotal;
-    productosTexto += '• ' + item.nombre + ' x' + cantidad;
-    if (item.color) productosTexto += ' · ' + item.color;
-    if (item.talla) productosTexto += ' · Talla ' + item.talla;
-    productosTexto += ' · $' + subtotal.toLocaleString('es-CO') + '\n';
-    });
+    @GetMapping("/login")
+    public String login() { return "admin-login"; }
 
-    const pedido = {
-            nombreCliente: nombre,
-            telefono: telefono,
-            email: email,
-            departamento: departamento,
-            ciudad: ciudad,
-            direccion: direccion,
-            notas: notas,
-            tienda: 'GlobalLive',
-            productos: productosTexto,
-            total: total,
-            metodoPago: 'Contra entrega'
-    };
+    @PostMapping("/login")
+    public String procesarLogin(@RequestParam String password, Model model) {
+        if (adminPassword.equals(password)) return "redirect:/admin/panel?key=" + password;
+        model.addAttribute("error", "Contraseña incorrecta");
+        return "admin-login";
+    }
 
-    fetch('/api/pedido', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(pedido)
-    }).then(response => {
-            localStorage.removeItem('carritoVibeColombia');
-    carrito = [];
-    window.location.href = '/pedido-confirmado';
-    }).catch(error => {
-            alert('Error al guardar el pedido. Intenta de nuevo.');
-    });
+    @GetMapping("/panel")
+    public String panel(@RequestParam String key, Model model) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        model.addAttribute("productos", productoRepository.findAll());
+        model.addAttribute("key", key);
+        return "admin-panel";
+    }
+
+    @GetMapping("/pedidos")
+    public String pedidos(@RequestParam String key, Model model) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        model.addAttribute("pedidos", pedidoRepository.findAll());
+        model.addAttribute("key", key);
+        return "admin-pedidos";
+    }
+
+    @GetMapping("/nuevo")
+    public String nuevoProducto(@RequestParam String key, Model model) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        model.addAttribute("producto", new Producto());
+        model.addAttribute("key", key);
+        return "admin-form";
+    }
+
+    @GetMapping("/editar/{id}")
+    public String editarProducto(@PathVariable Long id, @RequestParam String key, Model model) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        model.addAttribute("producto", productoRepository.findById(id).orElse(null));
+        model.addAttribute("key", key);
+        return "admin-form";
+    }
+
+    @PostMapping("/guardar")
+    public String guardarProducto(@ModelAttribute Producto producto, @RequestParam String key,
+                                  @RequestParam(required = false) MultipartFile imagen1File,
+                                  @RequestParam(required = false) MultipartFile imagen2File,
+                                  @RequestParam(required = false) MultipartFile imagen3File,
+                                  @RequestParam(required = false) MultipartFile imagen4File,
+                                  @RequestParam(required = false) MultipartFile imagen5File,
+                                  @RequestParam(required = false) MultipartFile imagen6File,
+                                  @RequestParam(required = false) MultipartFile imagen7File,
+                                  @RequestParam(required = false) MultipartFile imagen8File,
+                                  @RequestParam(required = false) MultipartFile imagen9File,
+                                  @RequestParam(required = false) MultipartFile imagen10File,
+                                  RedirectAttributes redirect) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        try {
+            MultipartFile[] nuevasImagenes = {imagen1File, imagen2File, imagen3File, imagen4File, imagen5File,
+                    imagen6File, imagen7File, imagen8File, imagen9File, imagen10File};
+            if (producto.getId() != null) {
+                Producto existente = productoRepository.findById(producto.getId()).orElse(null);
+                if (existente != null) {
+                    producto.setImagen1(existente.getImagen1()); producto.setImagen2(existente.getImagen2());
+                    producto.setImagen3(existente.getImagen3()); producto.setImagen4(existente.getImagen4());
+                    producto.setImagen5(existente.getImagen5()); producto.setImagen6(existente.getImagen6());
+                    producto.setImagen7(existente.getImagen7()); producto.setImagen8(existente.getImagen8());
+                    producto.setImagen9(existente.getImagen9()); producto.setImagen10(existente.getImagen10());
+                }
+            }
+            String[] setters = {"setImagen1","setImagen2","setImagen3","setImagen4","setImagen5",
+                    "setImagen6","setImagen7","setImagen8","setImagen9","setImagen10"};
+            for (int i = 0; i < 10; i++) {
+                if (nuevasImagenes[i] != null && !nuevasImagenes[i].isEmpty()) {
+                    String base64 = "data:" + nuevasImagenes[i].getContentType() + ";base64," +
+                            Base64.getEncoder().encodeToString(nuevasImagenes[i].getBytes());
+                    Producto.class.getMethod(setters[i], String.class).invoke(producto, base64);
+                }
+            }
+            productoRepository.save(producto);
+            redirect.addFlashAttribute("mensaje", "✅ Producto guardado!");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "❌ Error: " + e.getMessage());
+        }
+        return "redirect:/admin/panel?key=" + key;
+    }
+
+    @GetMapping("/eliminar/{id}")
+    public String eliminarProducto(@PathVariable Long id, @RequestParam String key, RedirectAttributes redirect) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        productoRepository.deleteById(id);
+        redirect.addFlashAttribute("mensaje", "🗑️ Producto eliminado!");
+        return "redirect:/admin/panel?key=" + key;
+    }
 }

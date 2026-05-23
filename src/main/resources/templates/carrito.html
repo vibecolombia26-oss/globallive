@@ -34,7 +34,7 @@
         .form-group { margin-bottom: 15px; }
         .form-group.full { grid-column: 1 / -1; }
         .form-group label { display: block; margin-bottom: 5px; color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.9rem; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.9rem; }
         .form-group input:focus, .form-group select:focus { border-color: #4CAF50; outline: none; }
         .btn-submit { display: block; width: 100%; padding: 18px; text-align: center; background: #4CAF50; color: #000; font-size: 1rem; font-weight: 600; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px; }
         .btn-submit:hover { box-shadow: 0 0 30px rgba(76,175,80,0.4); }
@@ -157,6 +157,35 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pedido)
         }).then(response => {
+            // WhatsApp para el CLIENTE
+            let mensajeCliente = '✅ *¡Gracias por tu pedido, ' + nombre.split(' ')[0] + '!*%0A%0A';
+            mensajeCliente += 'Tu orden ha sido registrada en *GlobalLive*.%0A%0A';
+            mensajeCliente += '📦 *Resumen:*%0A' + productosTexto.replace(/\n/g, '%0A');
+            mensajeCliente += '%0A💰 *Total:* $' + total.toLocaleString('es-CO');
+            mensajeCliente += '%0A🚚 *Envío:* GRATIS';
+            mensajeCliente += '%0A💚 *Pago:* Contra entrega%0A%0A';
+            mensajeCliente += '📍 Entregaremos en:%0A' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
+            mensajeCliente += '⏱️ Te notificaremos cuando tu pedido esté en camino.%0A';
+            mensajeCliente += '📧 También recibirás un correo de confirmación.%0A%0A';
+            mensajeCliente += '¿Dudas? Escríbenos aquí mismo 💬%0A%0A';
+            mensajeCliente += '*GlobalLive* · Salud & Bienestar 💚';
+
+            if (telefono) {
+                window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensajeCliente, '_blank');
+            }
+
+            // WhatsApp para el DUEÑO
+            let mensajeDueno = '🛒 *¡NUEVO PEDIDO!*%0A%0A';
+            mensajeDueno += '👤 *Cliente:* ' + nombre + '%0A';
+            mensajeDueno += '📞 *Teléfono:* ' + telefono + '%0A';
+            if (email) mensajeDueno += '📧 *Email:* ' + email + '%0A';
+            mensajeDueno += '📍 *Dirección:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
+            mensajeDueno += '📦 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
+            mensajeDueno += '%0A💰 *Total:* $' + total.toLocaleString('es-CO');
+            mensajeDueno += '%0A💚 *Pago:* Contra entrega';
+
+            window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
+
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
             window.location.href = '/pedido-confirmado';
