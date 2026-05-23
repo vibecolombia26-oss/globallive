@@ -6,10 +6,7 @@
     <title>Carrito - GlobalLive</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
-            color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
-        }
+        body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%); color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         h1 { text-align: center; font-size: 2rem; font-weight: 300; color: #fff; letter-spacing: 4px; margin-bottom: 10px; }
         .subtitle { text-align: center; color: #4CAF50; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 6px; font-size: 0.85rem; }
@@ -121,35 +118,51 @@
     function completarOrden() {
         const nombre = document.getElementById('nombreCliente').value;
         const telefono = document.getElementById('telefono').value;
+        const email = document.getElementById('email').value;
         const departamento = document.getElementById('departamento').value;
         const ciudad = document.getElementById('ciudad').value;
         const direccion = document.getElementById('direccion').value;
         const notas = document.getElementById('notas').value;
         if (!nombre || !telefono || !departamento || !ciudad || !direccion) { alert('Completa todos los campos requeridos (*)'); return; }
-        let mensaje = '🛒 *NUEVO PEDIDO - GlobalLive*%0A%0A';
-        mensaje += '👤 *Cliente:* ' + nombre + '%0A';
-        mensaje += '📞 *Teléfono:* ' + telefono + '%0A';
-        mensaje += '📍 *Dirección:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A';
-        mensaje += '🚚 *Envío:* GRATIS%0A';
-        if (notas) mensaje += '📝 *Notas:* ' + notas + '%0A';
-        mensaje += '%0A--- 📦 *Productos* ---%0A';
+
+        let productosTexto = '';
         let total = 0;
         carrito.forEach(item => {
             const precio = Number(item.precio) || 0;
             const cantidad = Number(item.cantidad) || 1;
             const subtotal = precio * cantidad;
             total += subtotal;
-            mensaje += '• ' + item.nombre + ' x' + cantidad;
-            if (item.color) mensaje += ' · ' + item.color;
-            if (item.talla) mensaje += ' · Talla ' + item.talla;
-            mensaje += ' · $' + subtotal.toLocaleString('es-CO') + '%0A';
+            productosTexto += '• ' + item.nombre + ' x' + cantidad;
+            if (item.color) productosTexto += ' · ' + item.color;
+            if (item.talla) productosTexto += ' · Talla ' + item.talla;
+            productosTexto += ' · $' + subtotal.toLocaleString('es-CO') + '\n';
         });
-        mensaje += '%0A💰 *Total:* $' + total.toLocaleString('es-CO') + '%0A';
-        mensaje += '💚 *Pago:* Contra entrega';
-        window.open('https://wa.me/573234329406?text=' + mensaje, '_blank');
-        localStorage.removeItem('carritoVibeColombia');
-        carrito = []; renderCarrito();
-        alert('✅ ¡Pedido enviado! Te contactaremos pronto.');
+
+        const pedido = {
+            nombreCliente: nombre,
+            telefono: telefono,
+            email: email,
+            departamento: departamento,
+            ciudad: ciudad,
+            direccion: direccion,
+            notas: notas,
+            tienda: 'GlobalLive',
+            productos: productosTexto,
+            total: total,
+            metodoPago: 'Contra entrega'
+        };
+
+        fetch('/api/pedido', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pedido)
+        }).then(response => {
+            localStorage.removeItem('carritoVibeColombia');
+            carrito = [];
+            window.location.href = '/pedido-confirmado';
+        }).catch(error => {
+            alert('Error al guardar el pedido. Intenta de nuevo.');
+        });
     }
     function cancelarOrden() {
         if (confirm('¿Cancelar el pedido? Se vaciará tu carrito.')) {
