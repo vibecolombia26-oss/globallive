@@ -31,4 +31,9 @@ public class WebController {
     public String carrito() {
         return "carrito";
     }
+
+    @GetMapping("/pedido-confirmado")
+    public String pedidoConfirmado() {
+        return "pedido-confirmado";
+    }
 }
