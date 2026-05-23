@@ -158,17 +158,42 @@
             body: JSON.stringify(pedido)
         }).then(response => {
             // WhatsApp para el CLIENTE
-            let mensajeCliente = '✅ *¡Gracias por tu pedido, ' + nombre.split(' ')[0] + '!*%0A%0A';
+            let mensajeCliente = '%E2%9C%85 *Gracias por tu pedido, ' + nombre.split(' ')[0] + '!*%0A%0A';
             mensajeCliente += 'Tu orden ha sido registrada en *GlobalLive*.%0A%0A';
-            mensajeCliente += '📦 *Resumen:*%0A' + productosTexto.replace(/\n/g, '%0A');
-            mensajeCliente += '%0A💰 *Total:* $' + total.toLocaleString('es-CO');
-            mensajeCliente += '%0A🚚 *Envío:* GRATIS';
-            mensajeCliente += '%0A💚 *Pago:* Contra entrega%0A%0A';
-            mensajeCliente += '📍 Entregaremos en:%0A' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
-            mensajeCliente += '⏱️ Te notificaremos cuando tu pedido esté en camino.%0A';
-            mensajeCliente += '📧 También recibirás un correo de confirmación.%0A%0A';
-            mensajeCliente += '¿Dudas? Escríbenos aquí mismo 💬%0A%0A';
-            mensajeCliente += '*GlobalLive* · Salud & Bienestar 💚';
+            mensajeCliente += '%F0%9F%93%A6 *Resumen:*%0A' + productosTexto.replace(/\n/g, '%0A');
+            mensajeCliente += '%0A%F0%9F%92%B0 *Total:* $' + total.toLocaleString('es-CO');
+            mensajeCliente += '%0A%F0%9F%9A%9A *Envio:* GRATIS';
+            mensajeCliente += '%0A%F0%9F%92%9A *Pago:* Contra entrega%0A%0A';
+            mensajeCliente += '%F0%9F%93%8D Entregaremos en:%0A' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
+            mensajeCliente += '%E2%8F%B1 Te notificaremos cuando tu pedido este en camino.%0A';
+            mensajeCliente += '%F0%9F%93%A7 Tambien recibiras un correo de confirmacion.%0A%0A';
+            mensajeCliente += 'Dudas? Escribenos aqui mismo %F0%9F%92%AC%0A%0A';
+            mensajeCliente += '*GlobalLive* - Salud & Bienestar %F0%9F%92%9A';
+
+            if (telefono) {
+                window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensajeCliente, '_blank');
+            }
+
+            // WhatsApp para el DUENO
+            let mensajeDueno = '%F0%9F%9B%92 *NUEVO PEDIDO!*%0A%0A';
+            mensajeDueno += '%F0%9F%91%A4 *Cliente:* ' + nombre + '%0A';
+            mensajeDueno += '%F0%9F%93%9E *Telefono:* ' + telefono + '%0A';
+            if (email) mensajeDueno += '%F0%9F%93%A7 *Email:* ' + email + '%0A';
+            mensajeDueno += '%F0%9F%93%8D *Direccion:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
+            mensajeDueno += '%F0%9F%93%A6 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
+            mensajeDueno += '%0A%F0%9F%92%B0 *Total:* $' + total.toLocaleString('es-CO');
+            mensajeDueno += '%0A%F0%9F%92%9A *Pago:* Contra entrega';
+
+            window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
+
+            localStorage.removeItem('carritoVibeColombia');
+            carrito = [];
+            window.location.href = '/pedido-confirmado';
+        }).catch(error => {
+            localStorage.removeItem('carritoVibeColombia');
+            carrito = [];
+            window.location.href = '/pedido-confirmado';
+        });
 
             if (telefono) {
                 window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensajeCliente, '_blank');
