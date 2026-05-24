@@ -145,17 +145,10 @@
         });
 
         const pedido = {
-            nombreCliente: nombre,
-            telefono: telefono,
-            email: email,
-            departamento: departamento,
-            ciudad: ciudad,
-            direccion: direccion,
-            notas: notas,
-            tienda: 'GlobalLive',
-            productos: productosTexto,
-            total: total,
-            metodoPago: 'Contra entrega'
+            nombreCliente: nombre, telefono: telefono, email: email,
+            departamento: departamento, ciudad: ciudad, direccion: direccion,
+            notas: notas, tienda: 'GlobalLive', productos: productosTexto,
+            total: total, metodoPago: 'Contra entrega'
         };
 
         fetch('/api/pedido', {
@@ -163,15 +156,6 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pedido)
         }).then(response => {
-            let mensajeDueno = '%F0%9F%9B%92 *NUEVO PEDIDO!*%0A%0A';
-            mensajeDueno += '%F0%9F%91%A4 *Cliente:* ' + nombre + '%0A';
-            mensajeDueno += '%F0%9F%93%9E *Telefono:* ' + telefono + '%0A';
-            if (email) mensajeDueno += '%F0%9F%93%A7 *Email:* ' + email + '%0A';
-            mensajeDueno += '%F0%9F%93%8D *Direccion:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
-            mensajeDueno += '%F0%9F%93%A6 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
-            mensajeDueno += '%0A%F0%9F%92%B0 *Total:* $' + total.toLocaleString('es-CO');
-            mensajeDueno += '%0A%F0%9F%92%9A *Pago:* Contra entrega';
-            window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
             window.location.href = '/pedido-confirmado';
