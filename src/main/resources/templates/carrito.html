@@ -76,6 +76,7 @@
 <script>
     let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
     function guardarCarrito() { localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito)); }
+
     function renderCarrito() {
         const container = document.getElementById('cartItems');
         const totalDiv = document.getElementById('cartTotal');
@@ -95,13 +96,17 @@
         totalDiv.innerHTML = '<strong>Total:</strong> <span>$' + total.toLocaleString('es-CO') + '</span>';
         renderOrderSummary();
     }
+
     function cambiarCantidad(index, delta, valorDirecto) {
         if (valorDirecto) carrito[index].cantidad = Math.max(1, parseInt(valorDirecto) || 1);
         else carrito[index].cantidad = Math.max(1, (Number(carrito[index].cantidad) || 1) + delta);
         guardarCarrito(); renderCarrito();
     }
+
     function cambiarVariacion(index, tipo, valor) { carrito[index][tipo] = valor; guardarCarrito(); renderCarrito(); }
+
     function eliminarItem(index) { carrito.splice(index, 1); guardarCarrito(); renderCarrito(); }
+
     function renderOrderSummary() {
         const summary = document.getElementById('orderSummary');
         let total = 0; let html = '';
@@ -115,6 +120,7 @@
         html += '<div style="display:flex;justify-content:space-between;padding:10px 0;color:#4CAF50;font-weight:500;"><span>Envío</span><span>GRATIS</span></div><div style="display:flex;justify-content:space-between;padding:15px 0;font-size:1.2rem;font-weight:600;border-top:1px solid #333;margin-top:10px;"><span>Total</span><span style="color:#4CAF50;">$' + total.toLocaleString('es-CO') + '</span></div>';
         summary.innerHTML = html;
     }
+
     function completarOrden() {
         const nombre = document.getElementById('nombreCliente').value;
         const telefono = document.getElementById('telefono').value;
@@ -157,7 +163,6 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pedido)
         }).then(response => {
-            // WhatsApp SOLO para el DUEÑO
             let mensajeDueno = '%F0%9F%9B%92 *NUEVO PEDIDO!*%0A%0A';
             mensajeDueno += '%F0%9F%91%A4 *Cliente:* ' + nombre + '%0A';
             mensajeDueno += '%F0%9F%93%9E *Telefono:* ' + telefono + '%0A';
@@ -166,9 +171,7 @@
             mensajeDueno += '%F0%9F%93%A6 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
             mensajeDueno += '%0A%F0%9F%92%B0 *Total:* $' + total.toLocaleString('es-CO');
             mensajeDueno += '%0A%F0%9F%92%9A *Pago:* Contra entrega';
-
             window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
-
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
             window.location.href = '/pedido-confirmado';
@@ -176,56 +179,9 @@
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
             window.location.href = '/pedido-confirmado';
-        });
-
-            if (telefono) {
-                window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensajeCliente, '_blank');
-            }
-
-            // WhatsApp para el DUENO
-            let mensajeDueno = '%F0%9F%9B%92 *NUEVO PEDIDO!*%0A%0A';
-            mensajeDueno += '%F0%9F%91%A4 *Cliente:* ' + nombre + '%0A';
-            mensajeDueno += '%F0%9F%93%9E *Telefono:* ' + telefono + '%0A';
-            if (email) mensajeDueno += '%F0%9F%93%A7 *Email:* ' + email + '%0A';
-            mensajeDueno += '%F0%9F%93%8D *Direccion:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
-            mensajeDueno += '%F0%9F%93%A6 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
-            mensajeDueno += '%0A%F0%9F%92%B0 *Total:* $' + total.toLocaleString('es-CO');
-            mensajeDueno += '%0A%F0%9F%92%9A *Pago:* Contra entrega';
-
-            window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
-
-            localStorage.removeItem('carritoVibeColombia');
-            carrito = [];
-            window.location.href = '/pedido-confirmado';
-        }).catch(error => {
-            localStorage.removeItem('carritoVibeColombia');
-            carrito = [];
-            window.location.href = '/pedido-confirmado';
-        });
-
-            if (telefono) {
-                window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensajeCliente, '_blank');
-            }
-
-            // WhatsApp para el DUEÑO
-            let mensajeDueno = '🛒 *¡NUEVO PEDIDO!*%0A%0A';
-            mensajeDueno += '👤 *Cliente:* ' + nombre + '%0A';
-            mensajeDueno += '📞 *Teléfono:* ' + telefono + '%0A';
-            if (email) mensajeDueno += '📧 *Email:* ' + email + '%0A';
-            mensajeDueno += '📍 *Dirección:* ' + direccion + ', ' + ciudad + ', ' + departamento + '%0A%0A';
-            mensajeDueno += '📦 *Productos:*%0A' + productosTexto.replace(/\n/g, '%0A');
-            mensajeDueno += '%0A💰 *Total:* $' + total.toLocaleString('es-CO');
-            mensajeDueno += '%0A💚 *Pago:* Contra entrega';
-
-            window.open('https://wa.me/573234329406?text=' + mensajeDueno, '_blank');
-
-            localStorage.removeItem('carritoVibeColombia');
-            carrito = [];
-            window.location.href = '/pedido-confirmado';
-        }).catch(error => {
-            alert('Error al guardar el pedido. Intenta de nuevo.');
         });
     }
+
     function cancelarOrden() {
         if (confirm('¿Cancelar el pedido? Se vaciará tu carrito.')) {
             localStorage.removeItem('carritoVibeColombia');
@@ -233,6 +189,7 @@
             window.location.href = '/';
         }
     }
+
     renderCarrito();
 </script>
 </body>
