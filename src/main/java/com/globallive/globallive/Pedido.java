@@ -79,4 +79,10 @@ public class Pedido {
     private String codigo;
     public String getCodigo() { return codigo; }
     public void setCodigo(String codigo) { this.codigo = codigo; }
+    private String guia;
+    private String estadoEnvio;
+    public String getGuia() { return guia; }
+    public void setGuia(String guia) { this.guia = guia; }
+    public String getEstadoEnvio() { return estadoEnvio; }
+    public void setEstadoEnvio(String estadoEnvio) { this.estadoEnvio = estadoEnvio; }
 }

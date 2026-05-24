@@ -10,35 +10,30 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
         .header h1 { font-size: 1.5rem; font-weight: 300; color: #4CAF50; letter-spacing: 3px; }
-        .btn { padding: 10px 24px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-productos { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; }
-        .btn-productos:hover { background: rgba(76,175,80,0.1); }
-        .pedido-card {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px; padding: 20px; margin-bottom: 20px;
-        }
-        .pedido-header {
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 10px; margin-bottom: 15px;
-            padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
+        .btn { padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
+        .btn-back { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; }
+        .btn-tienda { background: transparent; color: #fff; border: 1px solid #fff; margin-left: 10px; }
+        .pedido-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .pedido-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .pedido-id { color: #4CAF50; font-weight: 600; font-size: 1.1rem; }
         .pedido-fecha { color: #666; font-size: 0.85rem; }
-        .estado {
-            padding: 5px 15px; border-radius: 20px; font-size: 0.8rem;
-            font-weight: 600; text-transform: uppercase;
-        }
+        .estado { padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
         .estado-pendiente { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid #ffc107; }
         .estado-procesando { background: rgba(33,150,243,0.15); color: #2196F3; border: 1px solid #2196F3; }
-        .estado-completado { background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid #4CAF50; }
+        .estado-enviado { background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid #4CAF50; }
         .pedido-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; }
         .pedido-body .label { color: #888; }
         .pedido-body .value { color: #fff; }
-        .pedido-productos {
-            grid-column: 1 / -1; background: #111; padding: 15px;
-            border-radius: 8px; margin-top: 10px;
-        }
+        .pedido-productos { grid-column: 1 / -1; background: #111; padding: 15px; border-radius: 8px; margin-top: 10px; white-space: pre-line; }
         .pedido-total { font-size: 1.3rem; color: #4CAF50; font-weight: 600; }
+        .acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 15px; }
+        .btn-accion { padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.3s; border: none; text-transform: uppercase; }
+        .btn-procesar { background: #2196F3; color: #fff; }
+        .btn-enviar { background: #4CAF50; color: #000; }
+        .btn-whatsapp { background: #25D366; color: #fff; }
+        .btn-guia { background: #ff9800; color: #000; }
+        .msg-select { padding: 8px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.8rem; max-width: 200px; }
+        .guia-input { padding: 8px 12px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.85rem; width: 200px; }
         @media (max-width: 600px) { .pedido-body { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -47,8 +42,8 @@
     <div class="header">
         <h1>📋 Pedidos</h1>
         <div>
-            <a th:href="@{/admin/panel(key=${key})}" class="btn btn-productos">← Productos</a>
-            <a href="/" class="btn btn-productos" style="margin-left:10px;">Ver Tienda</a>
+            <a th:href="@{/admin/panel(key=${key})}" class="btn btn-back">← Productos</a>
+            <a href="/" class="btn btn-tienda">🏪 Ver Tienda</a>
         </div>
     </div>
 
@@ -60,27 +55,65 @@
         <div class="pedido-card">
             <div class="pedido-header">
                 <div>
-                    <span class="pedido-id">Pedido #<span th:text="${pedido.id}">1</span></span>
+                    <span class="pedido-id">Pedido #<span th:text="${pedido.codigo}">GL-123</span></span>
                     <span class="pedido-fecha" style="margin-left:15px;" th:text="${#temporals.format(pedido.fecha, 'dd/MM/yyyy HH:mm')}">Fecha</span>
                 </div>
-                <span class="estado estado-pendiente" th:text="${pedido.estado}">Pendiente</span>
+                <span class="estado" th:classappend="${pedido.estado == 'Pendiente' ? 'estado-pendiente' : (pedido.estado == 'Procesando' ? 'estado-procesando' : 'estado-enviado')}" th:text="${pedido.estado}">Pendiente</span>
             </div>
             <div class="pedido-body">
                 <div><span class="label">Cliente:</span> <span class="value" th:text="${pedido.nombreCliente}"></span></div>
                 <div><span class="label">Teléfono:</span> <span class="value" th:text="${pedido.telefono}"></span></div>
                 <div><span class="label">Email:</span> <span class="value" th:text="${pedido.email}"></span></div>
-                <div><span class="label">Ubicación:</span> <span class="value" th:text="${pedido.ciudad} + ', ' + ${pedido.departamento}"></span></div>
+                <div><span class="label">Dirección:</span> <span class="value" th:text="${pedido.direccion + ', ' + pedido.ciudad + ', ' + pedido.departamento}"></span></div>
                 <div class="pedido-productos">
                     <strong style="color:#4CAF50;">Productos:</strong><br>
-                    <span th:text="${pedido.productos}" style="white-space:pre-line;"></span>
+                    <span th:text="${pedido.productos}"></span>
                 </div>
                 <div style="grid-column:1/-1; text-align:right;">
-                    <span class="label">Método de pago:</span> <span class="value" th:text="${pedido.metodoPago}"></span>
+                    <span class="label">Pago:</span> <span class="value" th:text="${pedido.metodoPago}"></span>
                     <span style="margin-left:20px;" class="pedido-total">Total: $<span th:text="${#numbers.formatDecimal(pedido.total, 0, 'COMMA', 0, 'POINT')}"></span></span>
                 </div>
+            </div>
+            <div class="acciones">
+                <button class="btn-accion btn-procesar" th:if="${pedido.estado == 'Pendiente'}" th:onclick="'cambiarEstado(\'' + ${pedido.id} + '\', \'Procesando\')'">🔄 Procesar</button>
+                <button class="btn-accion btn-enviar" th:if="${pedido.estado == 'Procesando'}" th:onclick="'cambiarEstado(\'' + ${pedido.id} + '\', \'Enviado\')'">📦 Enviar</button>
+
+                <select class="msg-select" th:id="'msgSelect_' + ${pedido.id}">
+                    <option value="">📩 Mensaje...</option>
+                    <option value="Hola, tu pedido ha sido confirmado y lo estamos preparando. Te notificaremos cuando est%C3%A9 en camino. %F0%9F%92%9A">Pedido confirmado</option>
+                    <option value="%C2%A1Buenas noticias! Tu pedido ya est%C3%A1 siendo procesado. En breve te daremos m%C3%A1s informaci%C3%B3n. %F0%9F%9A%80">En proceso</option>
+                    <option value="%C2%A1Tu pedido va en camino! %F0%9F%9A%9A%F0%9F%92%A8">Pedido enviado</option>
+                </select>
+                <button class="btn-accion btn-whatsapp" th:onclick="'enviarMensaje(\'' + ${pedido.telefono} + '\', \'' + ${pedido.id} + '\')'">💬 Enviar</button>
+
+                <input type="text" class="guia-input" placeholder="Guía Droppi..." th:id="'guiaInput_' + ${pedido.id}">
+                <button class="btn-accion btn-guia" th:onclick="'enviarGuia(\'' + ${pedido.telefono} + '\', \'' + ${pedido.id} + '\')'">📋 Enviar guía</button>
             </div>
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    var key = /*[[${key}]]*/ '';
+
+    function cambiarEstado(id, estado) {
+        fetch('/admin/cambiar-estado/' + id + '?key=' + key + '&estado=' + estado)
+            .then(function(r) { location.reload(); });
+    }
+
+    function enviarMensaje(telefono, id) {
+        var select = document.getElementById('msgSelect_' + id);
+        var mensaje = select.value;
+        if (!mensaje) { alert('Selecciona un mensaje'); return; }
+        window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensaje, '_blank');
+    }
+
+    function enviarGuia(telefono, id) {
+        var guia = document.getElementById('guiaInput_' + id).value;
+        if (!guia) { alert('Ingresa el n\u00FAmero de gu\u00EDa'); return; }
+        var mensaje = '%C2%A1Tu pedido ya est%C3%A1 en camino! %F0%9F%9A%9A%0A%0AN%C3%BAmero de gu%C3%ADa: ' + encodeURIComponent(guia) + '%0A%0APuedes hacer seguimiento en la p%C3%A1gina de la transportadora.%0A%0AGracias por confiar en GlobalLive %F0%9F%92%9A';
+        window.open('https://wa.me/57' + telefono.replace(/\D/g, '') + '?text=' + mensaje, '_blank');
+    }
+</script>
 </body>
 </html>
