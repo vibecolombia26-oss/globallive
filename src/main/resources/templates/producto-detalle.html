@@ -6,17 +6,10 @@
     <title th:text="${producto.nombre}">GlobalLive</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%);
-            color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh;
-        }
+        body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0d0d0d 100%); color: #e0e0e0; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .molecula { position: absolute; animation: flotarMolecula linear infinite; opacity: 0.08; }
-        @keyframes flotarMolecula {
-            0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.1; } 90% { opacity: 0.05; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-        }
+        @keyframes flotarMolecula { 0% { transform: translateY(105vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.1; } 90% { opacity: 0.05; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
         .container { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 20px; }
         .back-btn { display: inline-block; color: #4CAF50; text-decoration: none; padding: 10px 20px; margin: 20px 0; border: 1px solid #4CAF50; border-radius: 25px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
         .back-btn:hover { background: rgba(76,175,80,0.1); }
@@ -126,6 +119,7 @@
         precioTexto = precioTexto.replace('$', '').replace(/\./g, '').replace(/,/g, '').trim();
         precioBase = parseInt(precioTexto) || 0;
     };
+
     function cambiarCantidad(delta) {
         const input = document.getElementById('cantidad');
         let val = parseInt(input.value) || 1;
@@ -133,20 +127,24 @@
         input.value = val;
         actualizarSubtotal();
     }
+
     function actualizarSubtotal() {
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
         const subtotal = precioBase * cantidad;
         document.getElementById('subtotalDisplay').innerHTML = '= $' + subtotal.toLocaleString('es-CO');
     }
+
     function agregarAlCarrito() {
         const nombre = document.querySelector('.info h1').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
         const color = document.getElementById('colorSelect').value;
         const talla = document.getElementById('tallaSelect').value;
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+
         let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
         carrito.push({ nombre, precio: precioBase, imagen, cantidad, color, talla });
         localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
+
         const btn = document.querySelector('.btn-carrito');
         btn.textContent = '✓ Agregado';
         setTimeout(() => {
@@ -154,18 +152,22 @@
             else btn.textContent = 'Agregar al carrito';
         }, 500);
     }
+
     function comprarContraEntrega() {
         const nombre = document.querySelector('.info h1').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
         const color = document.getElementById('colorSelect').value;
         const talla = document.getElementById('tallaSelect').value;
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+
         let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
         carrito.push({ nombre, precio: precioBase, imagen, cantidad, color, talla, contraentrega: true });
         localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
         window.location.href = '/carrito';
     }
+
     actualizarSubtotal();
+
     const bg = document.getElementById('bgAnimado');
     const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
     for (let i = 0; i < 20; i++) {
