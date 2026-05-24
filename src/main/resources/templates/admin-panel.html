@@ -10,12 +10,19 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
         .header h1 { font-size: 1.5rem; font-weight: 300; color: #4CAF50; letter-spacing: 3px; }
-        .btn { padding: 10px 24px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-agregar { background: #4CAF50; color: #000; }
-        .btn-agregar:hover { box-shadow: 0 0 20px rgba(76,175,80,0.4); }
-        .btn-ver { background: transparent; color: #fff; border: 1px solid #fff; }
-        .btn-ver:hover { background: #fff; color: #000; }
+        .header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
+        .btn-pedidos { background: #4CAF50; color: #000; }
+        .btn-pedidos:hover { box-shadow: 0 0 20px rgba(76,175,80,0.4); }
+        .btn-agregar { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; }
+        .btn-agregar:hover { background: rgba(76,175,80,0.1); }
+        .btn-tienda { background: transparent; color: #fff; border: 1px solid #fff; }
+        .btn-tienda:hover { background: #fff; color: #000; }
         .mensaje { background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.2); padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #4CAF50; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-card .number { font-size: 2rem; font-weight: 600; color: #4CAF50; }
+        .stat-card .label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
         table { width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.03); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
         th { background: rgba(76,175,80,0.05); padding: 15px; color: #4CAF50; text-align: left; font-weight: 500; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
         td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
@@ -25,32 +32,62 @@
         .btn-eliminar { background: transparent; color: #ff4444; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; border: 1px solid #ff4444; }
         .btn-eliminar:hover { background: #ff4444; color: #fff; }
         .producto-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .empty { text-align: center; padding: 40px; color: #666; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>Panel Administrador</h1>
-        <div>
+        <h1>📦 Panel Administrador</h1>
+        <div class="header-buttons">
+            <a th:href="@{/admin/pedidos(key=${key})}" class="btn btn-pedidos">📋 Pedidos</a>
             <a th:href="@{/admin/nuevo(key=${key})}" class="btn btn-agregar">+ Agregar Producto</a>
-            <a href="/" class="btn btn-ver" style="margin-left:10px;">Ver Tienda</a>
+            <a href="/" class="btn btn-tienda">🏪 Ver Tienda</a>
         </div>
     </div>
+
     <div class="mensaje" th:if="${mensaje}" th:text="${mensaje}"></div>
-    <table>
-        <thead><tr><th>ID</th><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Categoría</th><th>SKU</th><th>Acciones</th></tr></thead>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="number" th:text="${productos.size()}">0</div>
+            <div class="label">Productos</div>
+        </div>
+    </div>
+
+    <div th:if="${productos.isEmpty()}">
+        <div class="empty">🌿 No hay productos aún. ¡Agrega el primero!</div>
+    </div>
+
+    <table th:if="${!productos.isEmpty()}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Categoría</th>
+            <th>SKU</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
         <tbody>
         <tr th:each="p : ${productos}">
             <td th:text="${p.id}">1</td>
-            <td><img class="producto-img" th:src="${p.imagen1}" th:if="${p.imagen1 != null}"><span th:if="${p.imagen1 == null}" style="color:#666;">-</span></td>
+            <td>
+                <img class="producto-img" th:src="${p.imagen1}" th:alt="${p.nombre}" th:if="${p.imagen1 != null}">
+                <span th:if="${p.imagen1 == null}" style="color:#666;">-</span>
+            </td>
             <td th:text="${p.nombre}">Nombre</td>
             <td th:text="'$' + ${#numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}">$0</td>
             <td th:text="${p.categoria}">Cat</td>
             <td th:text="${p.sku}">SKU</td>
-            <td><div class="acciones">
-                <a th:href="@{/admin/editar/{id}(id=${p.id}, key=${key})}" class="btn-editar">Editar</a>
-                <a th:href="@{/admin/eliminar/{id}(id=${p.id}, key=${key})}" class="btn-eliminar" onclick="return confirm('¿Eliminar?')">Eliminar</a>
-            </div></td>
+            <td>
+                <div class="acciones">
+                    <a th:href="@{/admin/editar/{id}(id=${p.id}, key=${key})}" class="btn-editar">✏️ Editar</a>
+                    <a th:href="@{/admin/eliminar/{id}(id=${p.id}, key=${key})}" class="btn-eliminar" onclick="return confirm('¿Eliminar este producto?')">🗑️</a>
+                </div>
+            </td>
         </tr>
         </tbody>
     </table>
