@@ -3,6 +3,9 @@ package com.globallive.globallive;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 public class PedidoController {
 
@@ -16,8 +19,9 @@ public class PedidoController {
 
     @PostMapping("/api/pedido")
     @ResponseBody
-    public String guardarPedido(@RequestBody Pedido pedido) {
+    public Map<String, String> guardarPedido(@RequestBody Pedido pedido) {
         pedido.setEstado("Pendiente");
+        pedido.setCodigo("GL-" + System.currentTimeMillis());
         pedidoRepository.save(pedido);
 
         // Enviar correo de confirmación
@@ -34,6 +38,28 @@ public class PedidoController {
             }
         }
 
-        return "OK";
+        Map<String, String> response = new HashMap<>();
+        response.put("codigo", pedido.getCodigo());
+        response.put("status", "OK");
+        return response;
+    }
+
+    @GetMapping("/api/pedido/{codigo}")
+    @ResponseBody
+    public Map<String, Object> buscarPedido(@PathVariable String codigo) {
+        Pedido pedido = pedidoRepository.findAll().stream()
+                .filter(p -> codigo.equals(p.getCodigo()))
+                .findFirst().orElse(null);
+
+        Map<String, Object> response = new HashMap<>();
+        if (pedido == null) {
+            response.put("error", "Pedido no encontrado");
+        } else {
+            response.put("codigo", pedido.getCodigo());
+            response.put("estado", pedido.getEstado());
+            response.put("productos", pedido.getProductos());
+            response.put("total", pedido.getTotal());
+        }
+        return response;
     }
 }

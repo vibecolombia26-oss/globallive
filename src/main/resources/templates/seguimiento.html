@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento - GlobalLive</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 50%,#0d0d0d 100%); color:#e0e0e0; font-family:'Segoe UI',system-ui,sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+        .container { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:20px; padding:40px; max-width:500px; width:90%; text-align:center; }
+        h1 { font-size:1.5rem; font-weight:300; color:#4CAF50; letter-spacing:3px; margin-bottom:20px; }
+        input { width:100%; padding:15px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; font-size:1rem; text-align:center; margin-bottom:15px; }
+        input:focus { border-color:#4CAF50; outline:none; }
+        button { width:100%; padding:15px; background:#4CAF50; color:#000; border:none; border-radius:25px; font-weight:600; cursor:pointer; font-size:0.95rem; text-transform:uppercase; letter-spacing:2px; }
+        button:hover { box-shadow:0 0 20px rgba(76,175,80,0.4); }
+        .resultado { margin-top:20px; padding:20px; background:#111; border-radius:12px; text-align:left; display:none; }
+        .resultado .label { color:#888; font-size:0.8rem; text-transform:uppercase; }
+        .resultado .value { color:#fff; margin-bottom:10px; }
+        .estado { display:inline-block; padding:5px 15px; border-radius:20px; font-size:0.8rem; font-weight:600; }
+        .estado-pendiente { background:rgba(255,193,7,0.15); color:#ffc107; }
+        .error { color:#ff4444; margin-top:10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔍 Seguimiento de Pedido</h1>
+    <p style="color:#888; margin-bottom:20px;">Ingresa tu código de seguimiento</p>
+    <input type="text" id="codigoInput" placeholder="Ej: GL-123456789">
+    <button onclick="buscarPedido()">Consultar</button>
+    <div class="error" id="errorMsg"></div>
+    <div class="resultado" id="resultado">
+        <div class="label">Código</div><div class="value" id="rCodigo"></div>
+        <div class="label">Estado</div><div id="rEstado"></div>
+        <div class="label" style="margin-top:10px;">Productos</div><div class="value" id="rProductos"></div>
+        <div class="label">Total</div><div class="value" id="rTotal"></div>
+    </div>
+</div>
+<script>
+    function buscarPedido() {
+        const codigo = document.getElementById('codigoInput').value.trim();
+        if (!codigo) { document.getElementById('errorMsg').textContent = 'Ingresa un código'; return; }
+        fetch('/api/pedido/' + codigo)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { document.getElementById('errorMsg').textContent = data.error; document.getElementById('resultado').style.display = 'none'; }
+                else {
+                    document.getElementById('errorMsg').textContent = '';
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('rCodigo').textContent = data.codigo;
+                    document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
+                    document.getElementById('rProductos').textContent = data.productos;
+                    document.getElementById('rTotal').textContent = '$' + data.total.toLocaleString('es-CO');
+                }
+            });
+    }
+</script>
+</body>
+</html>

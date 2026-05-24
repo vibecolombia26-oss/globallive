@@ -76,4 +76,7 @@ public class Pedido {
     public void setEstado(String estado) { this.estado = estado; }
     public LocalDateTime getFecha() { return fecha; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    private String codigo;
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
 }

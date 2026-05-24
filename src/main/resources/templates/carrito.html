@@ -73,6 +73,20 @@
         <p style="text-align:center;color:#4CAF50;margin-top:15px;font-weight:500;">💚 Pago contra entrega</p>
     </div>
 </div>
+
+<!-- POP-UP DE CONFIRMACIÓN -->
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#1a1a1a; border:1px solid #4CAF50; border-radius:20px; padding:40px; text-align:center; max-width:450px; width:90%;">
+        <div style="font-size:4rem; color:#4CAF50; margin-bottom:15px;">✅</div>
+        <h2 style="color:#fff; font-weight:300; letter-spacing:2px; margin-bottom:10px;">¡Pedido Confirmado!</h2>
+        <p style="color:#888; margin-bottom:20px;">Tu código de seguimiento es:</p>
+        <div style="background:#111; border:1px solid #4CAF50; border-radius:10px; padding:15px; font-size:1.5rem; color:#4CAF50; font-weight:700; letter-spacing:3px; margin-bottom:20px;" id="modalCodigo">------</div>
+        <p style="color:#888; font-size:0.85rem; margin-bottom:10px;">📧 Recibirás un correo de confirmación</p>
+        <p style="color:#666; font-size:0.8rem; margin-bottom:20px;">Guarda este código para hacer seguimiento a tu pedido</p>
+        <button onclick="document.getElementById('modalOverlay').style.display='none'; window.location.href='/';" style="background:#4CAF50; color:#000; border:none; padding:12px 30px; border-radius:25px; cursor:pointer; font-weight:600; text-transform:uppercase; letter-spacing:1px;">Volver a la tienda</button>
+    </div>
+</div>
+
 <script>
     let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
     function guardarCarrito() { localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito)); }
@@ -102,9 +116,7 @@
         else carrito[index].cantidad = Math.max(1, (Number(carrito[index].cantidad) || 1) + delta);
         guardarCarrito(); renderCarrito();
     }
-
     function cambiarVariacion(index, tipo, valor) { carrito[index][tipo] = valor; guardarCarrito(); renderCarrito(); }
-
     function eliminarItem(index) { carrito.splice(index, 1); guardarCarrito(); renderCarrito(); }
 
     function renderOrderSummary() {
@@ -155,14 +167,18 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pedido)
-        }).then(response => {
+        }).then(response => response.json()).then(data => {
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
-            window.location.href = '/pedido-confirmado';
+            renderCarrito();
+            document.getElementById('modalCodigo').textContent = data.codigo;
+            document.getElementById('modalOverlay').style.display = 'flex';
         }).catch(error => {
             localStorage.removeItem('carritoVibeColombia');
             carrito = [];
-            window.location.href = '/pedido-confirmado';
+            renderCarrito();
+            document.getElementById('modalCodigo').textContent = 'Error';
+            document.getElementById('modalOverlay').style.display = 'flex';
         });
     }
 

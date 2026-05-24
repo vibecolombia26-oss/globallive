@@ -36,4 +36,9 @@ public class WebController {
     public String pedidoConfirmado() {
         return "pedido-confirmado";
     }
+
+    @GetMapping("/seguimiento")
+    public String seguimiento() {
+        return "seguimiento";
+    }
 }
