@@ -48,15 +48,14 @@ public class AdminController {
     }
 
     @GetMapping("/cambiar-estado/{id}")
-    @ResponseBody
     public String cambiarEstado(@PathVariable Long id, @RequestParam String key, @RequestParam String estado) {
-        if (!adminPassword.equals(key)) return "NO";
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
         Pedido pedido = pedidoRepository.findById(id).orElse(null);
         if (pedido != null) {
             pedido.setEstado(estado);
             pedidoRepository.save(pedido);
         }
-        return "OK";
+        return "redirect:/admin/pedidos?key=" + key;
     }
 
     @GetMapping("/nuevo")
