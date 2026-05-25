@@ -85,4 +85,10 @@ public class Pedido {
     public void setGuia(String guia) { this.guia = guia; }
     public String getEstadoEnvio() { return estadoEnvio; }
     public void setEstadoEnvio(String estadoEnvio) { this.estadoEnvio = estadoEnvio; }
+    private String transportadora;
+    private String numeroGuia;
+    public String getTransportadora() { return transportadora; }
+    public void setTransportadora(String transportadora) { this.transportadora = transportadora; }
+    public String getNumeroGuia() { return numeroGuia; }
+    public void setNumeroGuia(String numeroGuia) { this.numeroGuia = numeroGuia; }
 }

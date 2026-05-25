@@ -10,7 +10,7 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
         .header h1 { font-size: 1.5rem; font-weight: 300; color: #4CAF50; letter-spacing: 3px; }
-        .btn { padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; display: inline-block; cursor: pointer; }
+        .btn { padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; display: inline-block; cursor: pointer; border: none; }
         .btn-back { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; }
         .btn-tienda { background: transparent; color: #fff; border: 1px solid #fff; margin-left: 10px; }
         .pedido-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
@@ -21,6 +21,7 @@
         .estado-pendiente { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid #ffc107; }
         .estado-procesando { background: rgba(33,150,243,0.15); color: #2196F3; border: 1px solid #2196F3; }
         .estado-enviado { background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid #4CAF50; }
+        .estado-entregado { background: rgba(156,39,176,0.15); color: #9C27B0; border: 1px solid #9C27B0; }
         .pedido-body { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9rem; }
         .pedido-body .label { color: #888; }
         .pedido-body .value { color: #fff; }
@@ -30,10 +31,12 @@
         .btn-accion { padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.3s; border: none; text-transform: uppercase; }
         .btn-procesar { background: #2196F3; color: #fff; }
         .btn-enviar { background: #4CAF50; color: #000; }
+        .btn-entregar { background: #9C27B0; color: #fff; }
         .btn-whatsapp { background: #25D366; color: #fff; }
         .btn-guia { background: #ff9800; color: #000; }
-        .msg-select { padding: 8px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.8rem; max-width: 200px; }
-        .guia-input { padding: 8px 12px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.85rem; width: 200px; }
+        .envio-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .envio-form input, .envio-form select { padding: 8px 12px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.85rem; }
+        .guia-info { background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.85rem; }
         @media (max-width: 600px) { .pedido-body { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -61,6 +64,7 @@
                 <span class="estado estado-pendiente" th:if="${pedido.estado == 'Pendiente'}" th:text="${pedido.estado}">Pendiente</span>
                 <span class="estado estado-procesando" th:if="${pedido.estado == 'Procesando'}" th:text="${pedido.estado}">Procesando</span>
                 <span class="estado estado-enviado" th:if="${pedido.estado == 'Enviado'}" th:text="${pedido.estado}">Enviado</span>
+                <span class="estado estado-entregado" th:if="${pedido.estado == 'Entregado'}" th:text="${pedido.estado}">Entregado</span>
             </div>
             <div class="pedido-body">
                 <div><span class="label">Cliente:</span> <span class="value" th:text="${pedido.nombreCliente}"></span></div>
@@ -76,9 +80,38 @@
                     <span style="margin-left:20px;" class="pedido-total">Total: $<span th:text="${#numbers.formatDecimal(pedido.total, 0, 'COMMA', 0, 'POINT')}"></span></span>
                 </div>
             </div>
+
+            <!-- Info de envío -->
+            <div class="guia-info" th:if="${pedido.transportadora != null}">
+                🚚 <strong>Transportadora:</strong> <span th:text="${pedido.transportadora}"></span>
+                <span th:if="${pedido.numeroGuia != null}" style="margin-left:15px;">📋 <strong>Guía:</strong> <span th:text="${pedido.numeroGuia}"></span></span>
+            </div>
+
+            <!-- Acciones según estado -->
             <div class="acciones">
                 <a th:if="${pedido.estado == 'Pendiente'}" th:href="@{/admin/cambiar-estado/{id}(id=${pedido.id}, key=${key}, estado='Procesando')}" class="btn-accion btn-procesar">🔄 Procesar</a>
-                <a th:if="${pedido.estado == 'Procesando'}" th:href="@{/admin/cambiar-estado/{id}(id=${pedido.id}, key=${key}, estado='Enviado')}" class="btn-accion btn-enviar">📦 Enviar</a>
+
+                <div th:if="${pedido.estado == 'Procesando'}">
+                    <form class="envio-form" th:action="@{/admin/cambiar-estado/{id}(id=${pedido.id})}" method="post">
+                        <input type="hidden" name="key" th:value="${key}">
+                        <input type="hidden" name="estado" value="Enviado">
+                        <select name="transportadora" required>
+                            <option value="">🚚 Transportadora...</option>
+                            <option>Veloces</option>
+                            <option>Envia</option>
+                            <option>Interrapidísimo</option>
+                            <option>Domina</option>
+                            <option>Coordinadora</option>
+                            <option>99minutos</option>
+                            <option>TCC</option>
+                            <option>Droppi</option>
+                        </select>
+                        <input type="text" name="numeroGuia" placeholder="Número de guía" required>
+                        <button type="submit" class="btn-accion btn-enviar">📦 Enviar</button>
+                    </form>
+                </div>
+
+                <a th:if="${pedido.estado == 'Enviado'}" th:href="@{/admin/cambiar-estado/{id}(id=${pedido.id}, key=${key}, estado='Entregado')}" class="btn-accion btn-entregar">✅ Entregado</a>
             </div>
         </div>
     </div>

@@ -47,12 +47,16 @@ public class AdminController {
         return "admin-pedidos";
     }
 
-    @GetMapping("/cambiar-estado/{id}")
-    public String cambiarEstado(@PathVariable Long id, @RequestParam String key, @RequestParam String estado) {
+    @PostMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, @RequestParam String key, @RequestParam String estado,
+                                @RequestParam(required = false) String transportadora,
+                                @RequestParam(required = false) String numeroGuia) {
         if (!adminPassword.equals(key)) return "redirect:/admin/login";
         Pedido pedido = pedidoRepository.findById(id).orElse(null);
         if (pedido != null) {
             pedido.setEstado(estado);
+            if (transportadora != null) pedido.setTransportadora(transportadora);
+            if (numeroGuia != null) pedido.setNumeroGuia(numeroGuia);
             pedidoRepository.save(pedido);
         }
         return "redirect:/admin/pedidos?key=" + key;
