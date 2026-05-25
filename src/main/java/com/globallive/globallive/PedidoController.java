@@ -59,6 +59,8 @@ public class PedidoController {
             response.put("estado", pedido.getEstado());
             response.put("productos", pedido.getProductos());
             response.put("total", pedido.getTotal());
+            response.put("transportadora", pedido.getTransportadora());
+            response.put("numeroGuia", pedido.getNumeroGuia());
         }
         return response;
     }

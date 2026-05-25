@@ -32,7 +32,11 @@
         <div class="label">Código</div><div class="value" id="rCodigo"></div>
         <div class="label">Estado</div><div id="rEstado"></div>
         <div class="label" style="margin-top:10px;">Productos</div><div class="value" id="rProductos"></div>
-        <div class="label">Total</div><div class="value" id="rTotal"></div>
+        <div id="infoEnvio" style="display:none; margin-top:15px; padding:15px; background:rgba(76,175,80,0.05); border:1px solid rgba(76,175,80,0.2); border-radius:8px;">
+            <div class="label">🚚 Transportadora</div><div class="value" id="rTransportadora"></div>
+            <div class="label" style="margin-top:8px;">📋 Número de Guía</div><div class="value" id="rGuia"></div>
+        </div>
+        <div class="label" style="display:none;">Total</div><div class="value" id="rTotal" style="display:none;"></div>
     </div>
 </div>
 <script>
@@ -49,7 +53,12 @@
                     document.getElementById('rCodigo').textContent = data.codigo;
                     document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
                     document.getElementById('rProductos').textContent = data.productos;
-                    document.getElementById('rTotal').textContent = '$' + data.total.toLocaleString('es-CO');
+                    if (data.transportadora) {
+                        document.getElementById('rTransportadora').textContent = data.transportadora;
+                        document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente';
+                        document.getElementById('infoEnvio').style.display = 'block';
+                    }
+                    document.getElementById('rTotal').style.display = 'none';
                 }
             });
     }
