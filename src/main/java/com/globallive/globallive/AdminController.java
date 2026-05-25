@@ -14,11 +14,13 @@ public class AdminController {
 
     private final ProductoRepository productoRepository;
     private final PedidoRepository pedidoRepository;
+    private final EmailService emailService;
     private String adminPassword = "GlobalLive2026*";
 
-    public AdminController(ProductoRepository productoRepository, PedidoRepository pedidoRepository) {
+    public AdminController(ProductoRepository productoRepository, PedidoRepository pedidoRepository, EmailService emailService) {
         this.productoRepository = productoRepository;
         this.pedidoRepository = pedidoRepository;
+        this.emailService = emailService;
     }
 
     @GetMapping("/login")
@@ -58,6 +60,43 @@ public class AdminController {
             if (transportadora != null) pedido.setTransportadora(transportadora);
             if (numeroGuia != null) pedido.setNumeroGuia(numeroGuia);
             pedidoRepository.save(pedido);
+
+            // Enviar WhatsApp al cliente
+            String telefono = pedido.getTelefono();
+            if (telefono != null && !telefono.isEmpty()) {
+                String mensaje = "";
+                if (estado.equals("Procesando")) {
+                    mensaje = "Hola " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
+                            " ha sido confirmado y lo estamos preparando. Te notificaremos cuando este en camino. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
+                } else if (estado.equals("Enviado") && transportadora != null && numeroGuia != null) {
+                    mensaje = "Buenas noticias " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
+                            " ya va en camino! %F0%9F%9A%9A%0A%0ATransportadora: " + transportadora +
+                            "%0ANumero de guia: " + numeroGuia +
+                            "%0A%0APuedes hacer seguimiento en la pagina de la transportadora.%0AGracias por confiar en GlobalLive! %F0%9F%92%9A";
+                } else if (estado.equals("Entregado")) {
+                    mensaje = "Hola " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
+                            " ha sido entregado. Esperamos que disfrutes tu compra. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
+                }
+                if (!mensaje.isEmpty()) {
+                    enviarWhatsApp(telefono, mensaje);
+                }
+            }
+
+            // Enviar correo al cliente
+            String email = pedido.getEmail();
+            if (email != null && !email.isEmpty()) {
+                try {
+                    String asunto = "Actualizacion de tu pedido #" + pedido.getCodigo() + " - GlobalLive";
+                    String cuerpo = "Hola " + pedido.getNombreCliente() + "!\n\n" +
+                            "Tu pedido #" + pedido.getCodigo() + " ha cambiado a: " + estado + ".\n\n";
+                    if (transportadora != null) cuerpo += "Transportadora: " + transportadora + "\n";
+                    if (numeroGuia != null) cuerpo += "Numero de guia: " + numeroGuia + "\n";
+                    cuerpo += "\nGracias por confiar en GlobalLive %F0%9F%92%9A";
+                    emailService.enviarActualizacion(email, asunto, cuerpo);
+                } catch (Exception e) {
+                    System.out.println("Error enviando correo: " + e.getMessage());
+                }
+            }
         }
         return "redirect:/admin/pedidos?key=" + key;
     }
@@ -128,5 +167,20 @@ public class AdminController {
         productoRepository.deleteById(id);
         redirect.addFlashAttribute("mensaje", "🗑️ Producto eliminado!");
         return "redirect:/admin/panel?key=" + key;
+    }
+
+    private void enviarWhatsApp(String telefono, String mensaje) {
+        new Thread(() -> {
+            try {
+                String url = "https://wa.me/57" + telefono.replaceAll("[^0-9]", "") + "?text=" +
+                        java.net.URLEncoder.encode(mensaje, "UTF-8");
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
+                conn.setRequestMethod("GET");
+                conn.getResponseCode();
+                System.out.println("WhatsApp enviado a: " + telefono);
+            } catch (Exception e) {
+                System.out.println("Error enviando WhatsApp: " + e.getMessage());
+            }
+        }).start();
     }
 }
