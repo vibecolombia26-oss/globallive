@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chats - GlobalLive</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 50%,#0d0d0d 100%); color:#e0e0e0; font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; }
+        .container { max-width:900px; margin:0 auto; padding:20px; }
+        .header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:30px; padding:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; }
+        .header h1 { font-size:1.5rem; font-weight:300; color:#4CAF50; letter-spacing:3px; }
+        .btn { padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:500; transition:all 0.3s; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; }
+        .btn-back { background:transparent; color:#4CAF50; border:1px solid #4CAF50; }
+        .chat-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:20px; margin-bottom:15px; }
+        .chat-header { display:flex; justify-content:space-between; margin-bottom:10px; color:#4CAF50; font-weight:600; }
+        .chat-mensaje { padding:10px; margin:5px 0; border-radius:12px; font-size:0.9rem; }
+        .cliente { background:#4CAF50; color:#000; text-align:right; }
+        .respuesta { background:#333; color:#fff; text-align:left; }
+        .responder-form { display:flex; gap:10px; margin-top:10px; }
+        .responder-form input { flex:1; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; }
+        .responder-form button { background:#4CAF50; color:#000; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>💬 Chats</h1>
+        <a th:href="@{/admin/panel(key=${key})}" class="btn btn-back">← Panel</a>
+    </div>
+    <div th:each="msg : ${mensajes}">
+        <div class="chat-card" th:if="${msg.respuesta == null}">
+            <div class="chat-header">
+                <span th:text="${msg.codigoPedido}"></span>
+                <span th:text="${#temporals.format(msg.fecha, 'dd/MM HH:mm')}"></span>
+            </div>
+            <div class="chat-mensaje cliente" th:text="${msg.mensaje}"></div>
+            <form class="responder-form" th:action="@{/admin/responder/{id}(id=${msg.id}, key=${key})}" method="post">
+                <input type="text" name="respuesta" placeholder="Responder..." required>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

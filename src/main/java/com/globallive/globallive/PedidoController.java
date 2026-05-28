@@ -64,4 +64,39 @@ public class PedidoController {
         }
         return response;
     }
+    private final MensajeRepository mensajeRepository;
+
+    // Actualiza el constructor para incluir MensajeRepository
+    public PedidoController(PedidoRepository pedidoRepository, EmailService emailService, MensajeRepository mensajeRepository) {
+        this.pedidoRepository = pedidoRepository;
+        this.emailService = emailService;
+        this.mensajeRepository = mensajeRepository;
+    }
+
+    @PostMapping("/api/chat/enviar")
+    @ResponseBody
+    public Map<String, String> enviarMensaje(@RequestBody Map<String, String> body) {
+        String codigo = body.get("codigo");
+        String telefono = body.get("telefono");
+        String mensaje = body.get("mensaje");
+
+        Mensaje msg = new Mensaje(codigo, telefono, mensaje, true);
+        mensajeRepository.save(msg);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("status", "OK");
+        return response;
+    }
+
+    @GetMapping("/api/chat/mensajes")
+    @ResponseBody
+    public List<Mensaje> obtenerMensajes(@RequestParam(required = false) String codigo,
+                                         @RequestParam(required = false) String telefono) {
+        if (codigo != null && !codigo.isEmpty()) {
+            return mensajeRepository.findByCodigoPedidoOrderByFechaAsc(codigo);
+        } else if (telefono != null && !telefono.isEmpty()) {
+            return mensajeRepository.findByTelefonoOrderByFechaAsc(telefono);
+        }
+        return List.of();
+    }
 }

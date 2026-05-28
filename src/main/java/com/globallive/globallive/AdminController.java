@@ -14,12 +14,15 @@ public class AdminController {
 
     private final ProductoRepository productoRepository;
     private final PedidoRepository pedidoRepository;
+    private final MensajeRepository mensajeRepository;
     private final EmailService emailService;
     private String adminPassword = "GlobalLive2026*";
 
-    public AdminController(ProductoRepository productoRepository, PedidoRepository pedidoRepository, EmailService emailService) {
+    public AdminController(ProductoRepository productoRepository, PedidoRepository pedidoRepository,
+                           MensajeRepository mensajeRepository, EmailService emailService) {
         this.productoRepository = productoRepository;
         this.pedidoRepository = pedidoRepository;
+        this.mensajeRepository = mensajeRepository;
         this.emailService = emailService;
     }
 
@@ -49,6 +52,25 @@ public class AdminController {
         return "admin-pedidos";
     }
 
+    @GetMapping("/chats")
+    public String chats(@RequestParam String key, Model model) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        model.addAttribute("mensajes", mensajeRepository.findAll());
+        model.addAttribute("key", key);
+        return "admin-chats";
+    }
+
+    @PostMapping("/responder/{id}")
+    public String responder(@PathVariable Long id, @RequestParam String key, @RequestParam String respuesta) {
+        if (!adminPassword.equals(key)) return "redirect:/admin/login";
+        Mensaje msg = mensajeRepository.findById(id).orElse(null);
+        if (msg != null) {
+            msg.setRespuesta(respuesta);
+            mensajeRepository.save(msg);
+        }
+        return "redirect:/admin/chats?key=" + key;
+    }
+
     @PostMapping("/cambiar-estado/{id}")
     public String cambiarEstado(@PathVariable Long id, @RequestParam String key, @RequestParam String estado,
                                 @RequestParam(required = false) String transportadora,
@@ -61,41 +83,32 @@ public class AdminController {
             if (numeroGuia != null) pedido.setNumeroGuia(numeroGuia);
             pedidoRepository.save(pedido);
 
-            // Enviar WhatsApp al cliente
             String telefono = pedido.getTelefono();
             if (telefono != null && !telefono.isEmpty()) {
                 String mensaje = "";
                 if (estado.equals("Procesando")) {
                     mensaje = "Hola " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
-                            " ha sido confirmado y lo estamos preparando. Te notificaremos cuando este en camino. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
+                            " ha sido confirmado y lo estamos preparando. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
                 } else if (estado.equals("Enviado") && transportadora != null && numeroGuia != null) {
                     mensaje = "Buenas noticias " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
                             " ya va en camino! %F0%9F%9A%9A%0A%0ATransportadora: " + transportadora +
-                            "%0ANumero de guia: " + numeroGuia +
-                            "%0A%0APuedes hacer seguimiento en la pagina de la transportadora.%0AGracias por confiar en GlobalLive! %F0%9F%92%9A";
+                            "%0ANumero de guia: " + numeroGuia + "%0A%0AGracias por confiar en GlobalLive! %F0%9F%92%9A";
                 } else if (estado.equals("Entregado")) {
                     mensaje = "Hola " + pedido.getNombreCliente() + "! Tu pedido #" + pedido.getCodigo() +
-                            " ha sido entregado. Esperamos que disfrutes tu compra. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
+                            " ha sido entregado. Gracias por confiar en GlobalLive! %F0%9F%92%9A";
                 }
                 if (!mensaje.isEmpty()) {
                     enviarWhatsApp(telefono, mensaje);
                 }
             }
 
-            // Enviar correo al cliente
             String email = pedido.getEmail();
             if (email != null && !email.isEmpty()) {
                 try {
                     String asunto = "Actualizacion de tu pedido #" + pedido.getCodigo() + " - GlobalLive";
-                    String cuerpo = "Hola " + pedido.getNombreCliente() + "!\n\n" +
-                            "Tu pedido #" + pedido.getCodigo() + " ha cambiado a: " + estado + ".\n\n";
-                    if (transportadora != null) cuerpo += "Transportadora: " + transportadora + "\n";
-                    if (numeroGuia != null) cuerpo += "Numero de guia: " + numeroGuia + "\n";
-                    cuerpo += "\nGracias por confiar en GlobalLive %F0%9F%92%9A";
+                    String cuerpo = "Hola " + pedido.getNombreCliente() + "!\n\nTu pedido ha cambiado a: " + estado + ".\n\nGracias por confiar en GlobalLive %F0%9F%92%9A";
                     emailService.enviarActualizacion(email, asunto, cuerpo);
-                } catch (Exception e) {
-                    System.out.println("Error enviando correo: " + e.getMessage());
-                }
+                } catch (Exception e) {}
             }
         }
         return "redirect:/admin/pedidos?key=" + key;

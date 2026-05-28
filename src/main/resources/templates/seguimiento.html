@@ -6,8 +6,8 @@
     <title>Seguimiento - GlobalLive</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 50%,#0d0d0d 100%); color:#e0e0e0; font-family:'Segoe UI',system-ui,sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; }
-        .container { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:20px; padding:40px; max-width:500px; width:90%; text-align:center; }
+        body { background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 50%,#0d0d0d 100%); color:#e0e0e0; font-family:'Segoe UI',system-ui,sans-serif; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+        .container { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:20px; padding:40px; max-width:550px; width:100%; text-align:center; }
         h1 { font-size:1.5rem; font-weight:300; color:#4CAF50; letter-spacing:3px; margin-bottom:20px; }
         input { width:100%; padding:15px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; font-size:1rem; text-align:center; margin-bottom:15px; }
         input:focus { border-color:#4CAF50; outline:none; }
@@ -19,13 +19,27 @@
         .estado { display:inline-block; padding:5px 15px; border-radius:20px; font-size:0.8rem; font-weight:600; }
         .estado-pendiente { background:rgba(255,193,7,0.15); color:#ffc107; }
         .error { color:#ff4444; margin-top:10px; }
+
+        /* Chat */
+        .chat-container { display:none; margin-top:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(76,175,80,0.3); border-radius:16px; padding:20px; text-align:left; }
+        .chat-container h3 { color:#4CAF50; margin-bottom:15px; }
+        .preguntas { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
+        .preguntas button { width:auto; padding:8px 14px; background:rgba(76,175,80,0.1); color:#4CAF50; border:1px solid #4CAF50; border-radius:20px; cursor:pointer; font-size:0.8rem; text-transform:none; letter-spacing:0; }
+        .chat-mensajes { max-height:300px; overflow-y:auto; margin-bottom:15px; padding:10px; background:#111; border-radius:8px; }
+        .chat-input-row { display:flex; gap:10px; }
+        .chat-input-row input { flex:1; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; text-align:left; margin:0; }
+        .chat-input-row button { width:auto; padding:10px 20px; }
+        .msg-cliente { text-align:right; margin:8px 0; }
+        .msg-cliente div { display:inline-block; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem; }
+        .msg-respuesta { text-align:left; margin:8px 0; }
+        .msg-respuesta div { display:inline-block; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>🔍 Seguimiento de Pedido</h1>
-    <p style="color:#888; margin-bottom:20px;">Ingresa tu código de seguimiento</p>
-    <input type="text" id="codigoInput" placeholder="Ej: GL-123456789">
+    <p style="color:#888; margin-bottom:20px;">Ingresa tu código de seguimiento o número de celular</p>
+    <input type="text" id="codigoInput" placeholder="Ej: GL-123456789 o 3001234567">
     <button onclick="buscarPedido()">Consultar</button>
     <div class="error" id="errorMsg"></div>
     <div class="resultado" id="resultado">
@@ -36,18 +50,63 @@
             <div class="label">🚚 Transportadora</div><div class="value" id="rTransportadora"></div>
             <div class="label" style="margin-top:8px;">📋 Número de Guía</div><div class="value" id="rGuia"></div>
         </div>
-        <div class="label" style="display:none;">Total</div><div class="value" id="rTotal" style="display:none;"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-container" id="chatContainer">
+        <h3>💬 ¿Necesitas ayuda?</h3>
+        <div class="preguntas">
+            <button onclick="enviarPregunta('¿Cuál es el estado de mi pedido?')">📦 Estado del pedido</button>
+            <button onclick="enviarPregunta('¿Cuándo llegará mi pedido?')">🚚 Tiempo de entrega</button>
+            <button onclick="enviarPregunta('¿Puedo cambiar la dirección de envío?')">📍 Cambiar dirección</button>
+        </div>
+        <div class="chat-mensajes" id="chatMensajes"></div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
+            <button onclick="enviarMensaje()">Enviar</button>
+        </div>
     </div>
 </div>
+
 <script>
+    var codigoActual = '';
+    var telefonoActual = '';
+
     function buscarPedido() {
-        const codigo = document.getElementById('codigoInput').value.trim();
-        if (!codigo) { document.getElementById('errorMsg').textContent = 'Ingresa un código'; return; }
+        var codigo = document.getElementById('codigoInput').value.trim();
+        if (!codigo) { document.getElementById('errorMsg').textContent = 'Ingresa un código o teléfono'; return; }
+
+        var esTelefono = codigo.replace(/[^0-9]/g, '').length >= 10;
+
+        if (esTelefono) {
+            telefonoActual = codigo.replace(/[^0-9]/g, '');
+            fetch('/api/chat/mensajes?telefono=' + telefonoActual)
+                .then(r => r.json())
+                .then(mensajes => {
+                    if (mensajes.length > 0) {
+                        codigoActual = mensajes[0].codigoPedido;
+                        document.getElementById('errorMsg').textContent = '';
+                        document.getElementById('resultado').style.display = 'none';
+                        document.getElementById('chatContainer').style.display = 'block';
+                        cargarMensajes();
+                    } else {
+                        document.getElementById('errorMsg').textContent = 'No se encontraron mensajes';
+                        document.getElementById('resultado').style.display = 'none';
+                        document.getElementById('chatContainer').style.display = 'none';
+                    }
+                });
+            return;
+        }
+
+        codigoActual = codigo;
         fetch('/api/pedido/' + codigo)
             .then(r => r.json())
             .then(data => {
-                if (data.error) { document.getElementById('errorMsg').textContent = data.error; document.getElementById('resultado').style.display = 'none'; }
-                else {
+                if (data.error) {
+                    document.getElementById('errorMsg').textContent = data.error;
+                    document.getElementById('resultado').style.display = 'none';
+                    document.getElementById('chatContainer').style.display = 'none';
+                } else {
                     document.getElementById('errorMsg').textContent = '';
                     document.getElementById('resultado').style.display = 'block';
                     document.getElementById('rCodigo').textContent = data.codigo;
@@ -58,9 +117,46 @@
                         document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente';
                         document.getElementById('infoEnvio').style.display = 'block';
                     }
-                    document.getElementById('rTotal').style.display = 'none';
+                    document.getElementById('chatContainer').style.display = 'block';
+                    cargarMensajes();
                 }
             });
+    }
+
+    function cargarMensajes() {
+        var url = '/api/chat/mensajes?codigo=' + (codigoActual || '');
+        fetch(url)
+            .then(r => r.json())
+            .then(mensajes => {
+                var html = '';
+                mensajes.forEach(function(m) {
+                    if (m.esCliente) {
+                        html += '<div class="msg-cliente"><div>' + m.mensaje + '</div></div>';
+                        if (m.respuesta) {
+                            html += '<div class="msg-respuesta"><div>' + m.respuesta + '</div></div>';
+                        }
+                    }
+                });
+                document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666;">No hay mensajes aún</p>';
+            });
+    }
+
+    function enviarMensaje() {
+        var mensaje = document.getElementById('chatInput').value.trim();
+        if (!mensaje) return;
+        fetch('/api/chat/enviar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({codigo: codigoActual, telefono: telefonoActual, mensaje: mensaje})
+        }).then(function() {
+            document.getElementById('chatInput').value = '';
+            cargarMensajes();
+        });
+    }
+
+    function enviarPregunta(pregunta) {
+        document.getElementById('chatInput').value = pregunta;
+        enviarMensaje();
     }
 </script>
 </body>
