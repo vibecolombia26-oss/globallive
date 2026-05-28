@@ -59,6 +59,7 @@ public class PedidoController {
             response.put("total", pedido.getTotal());
             response.put("transportadora", pedido.getTransportadora());
             response.put("numeroGuia", pedido.getNumeroGuia());
+            response.put("telefono", pedido.getTelefono());
         }
         return response;
     }
