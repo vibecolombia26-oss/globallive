@@ -10,38 +10,32 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .molecula { position: absolute; animation: flotarMolecula linear infinite; opacity: 0.08; }
         @keyframes flotarMolecula { 0% { transform: translateY(105vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.1; } 90% { opacity: 0.05; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
-        .container { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .container { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 20px; }
         .back-btn { display: inline-block; color: #4CAF50; text-decoration: none; padding: 10px 20px; margin: 20px 0; border: 1px solid #4CAF50; border-radius: 25px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
         .back-btn:hover { background: rgba(76,175,80,0.1); }
-        .producto-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 30px; }
+        .producto-container { display: flex; flex-direction: column; gap: 30px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 30px; }
         .imagenes { display: flex; flex-direction: column; gap: 15px; }
-        .imagen-principal { width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .imagenes-secundarias { display: flex; gap: 10px; flex-wrap: wrap; }
+        .imagen-principal { width: 100%; max-height: 500px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .imagenes-secundarias { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .imagen-secundaria { width: 70px; height: 70px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; object-fit: cover; transition: all 0.3s; filter: brightness(0.9); }
         .imagen-secundaria:hover { border-color: #4CAF50; filter: brightness(1); }
-        .info h1 { font-size: 1.8rem; font-weight: 300; margin-bottom: 15px; color: #fff; letter-spacing: 2px; }
-        .precio { font-size: 2.5rem; font-weight: 600; color: #4CAF50; margin: 15px 0; }
-        .sku { color: #4CAF50; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500; }
+        .info h1 { font-size: 2rem; font-weight: 300; margin-bottom: 15px; color: #fff; letter-spacing: 2px; text-align: center; }
+        .precio { font-size: 2.8rem; font-weight: 600; color: #4CAF50; margin: 15px 0; text-align: center; }
+        .sku { color: #4CAF50; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500; text-align: center; }
         .categoria { display: inline-block; background: rgba(76,175,80,0.1); color: #4CAF50; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(76,175,80,0.2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-        .descripcion { color: #aaa; line-height: 1.8; margin: 20px 0; font-size: 0.95rem; }
-        .medidas { background: rgba(76,175,80,0.03); border: 1px solid rgba(76,175,80,0.15); border-radius: 12px; padding: 15px; margin: 20px 0; }
-        .medidas h3 { color: #4CAF50; margin-bottom: 10px; font-weight: 400; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .categoria-wrap { text-align: center; margin-bottom: 15px; }
+        .descripcion { color: #aaa; line-height: 1.8; margin: 20px 0; font-size: 0.95rem; text-align: center; }
+        .medidas { background: rgba(76,175,80,0.03); border: 1px solid rgba(76,175,80,0.15); border-radius: 12px; padding: 15px; margin: 20px auto; max-width: 400px; }
+        .medidas h3 { color: #4CAF50; margin-bottom: 10px; font-weight: 400; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
         .medidas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .medida-item { color: #888; font-size: 0.85rem; }
         .medida-item span { color: #ccc; }
-        .variaciones { background: rgba(76,175,80,0.03); border: 1px solid rgba(76,175,80,0.15); border-radius: 12px; padding: 15px; margin: 20px 0; }
-        .variaciones h3 { color: #4CAF50; margin-bottom: 12px; font-weight: 400; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        .variacion-row { display: flex; gap: 20px; flex-wrap: wrap; }
-        .variacion-group { flex: 1; min-width: 120px; }
-        .variacion-group label { display: block; color: #888; margin-bottom: 5px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-        .variacion-group select { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 0.9rem; }
-        .variacion-group select:focus { border-color: #4CAF50; outline: none; }
-        .cantidad-row { display: flex; align-items: center; gap: 15px; margin: 20px 0; background: rgba(76,175,80,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(76,175,80,0.15); }
+        .cantidad-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; background: rgba(76,175,80,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(76,175,80,0.15); }
         .cantidad-row label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .qty-btn { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; }
         .qty-btn:hover { background: #4CAF50; color: #000; }
         .qty-input { width: 55px; text-align: center; background: #111; color: #fff; border: 1px solid #333; padding: 8px; border-radius: 6px; font-size: 0.95rem; }
-        .subtotal-display { color: #4CAF50; font-weight: 600; font-size: 1.2rem; margin-left: auto; }
+        .subtotal-display { color: #4CAF50; font-weight: 600; font-size: 1.2rem; }
         .acciones { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
         .btn-carrito { width: 100%; padding: 16px; text-align: center; background: #4CAF50; color: #000; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; }
         .btn-carrito:hover { box-shadow: 0 0 30px rgba(76,175,80,0.4); }
@@ -52,7 +46,6 @@
         .banner-pago h3 { color: #4CAF50; font-size: 1rem; margin: 8px 0; font-weight: 500; }
         .banner-pago p { color: #888; font-size: 0.85rem; line-height: 1.6; }
         .banner-pago .destacado { color: #fff; font-weight: 600; }
-        @media (max-width: 768px) { .producto-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -60,6 +53,7 @@
 <div class="container">
     <a href="/" class="back-btn">← Volver</a>
     <div class="producto-container">
+        <!-- Imagen arriba -->
         <div class="imagenes">
             <img class="imagen-principal" th:src="${producto.imagen1}" th:alt="${producto.nombre}" id="imgPrincipal">
             <div class="imagenes-secundarias">
@@ -69,11 +63,14 @@
                 <img class="imagen-secundaria" th:if="${producto.imagen4 != null}" th:src="${producto.imagen4}" onclick="document.getElementById('imgPrincipal').src=this.src">
             </div>
         </div>
+        <!-- Info abajo -->
         <div class="info">
             <h1 th:text="${producto.nombre}">Nombre</h1>
             <div class="precio" th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 0, 'POINT')}">Precio</div>
-            <div class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</div>
-            <span class="categoria" th:text="${producto.categoria}">Categoría</span>
+            <div class="categoria-wrap">
+                <div class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</div>
+                <span class="categoria" th:text="${producto.categoria}">Categoría</span>
+            </div>
             <p class="descripcion" th:text="${producto.descripcionLarga != null ? producto.descripcionLarga : producto.descripcion}">Descripción</p>
             <div class="medidas" th:if="${producto.largo != null}">
                 <h3>Especificaciones</h3>
@@ -82,13 +79,6 @@
                     <div class="medida-item">Ancho: <span th:text="${producto.ancho}">-</span></div>
                     <div class="medida-item">Alto: <span th:text="${producto.alto}">-</span></div>
                     <div class="medida-item">Peso: <span th:text="${producto.peso}">-</span></div>
-                </div>
-            </div>
-            <div class="variaciones">
-                <h3>Personalizar</h3>
-                <div class="variacion-row">
-                    <div class="variacion-group"><label>Color</label><select id="colorSelect"><option value="">Seleccionar</option><option value="Blanco">Blanco</option><option value="Negro">Negro</option><option value="Gris">Gris</option></select></div>
-                    <div class="variacion-group"><label>Talla</label><select id="tallaSelect"><option value="">Seleccionar</option><option value="Única">Única</option><option value="S">S</option><option value="M">M</option><option value="L">L</option></select></div>
                 </div>
             </div>
             <div class="cantidad-row">
@@ -137,12 +127,10 @@
     function agregarAlCarrito() {
         const nombre = document.querySelector('.info h1').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
-        const color = document.getElementById('colorSelect').value;
-        const talla = document.getElementById('tallaSelect').value;
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
 
         let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
-        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color, talla });
+        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '' });
         localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
 
         const btn = document.querySelector('.btn-carrito');
@@ -156,12 +144,10 @@
     function comprarContraEntrega() {
         const nombre = document.querySelector('.info h1').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
-        const color = document.getElementById('colorSelect').value;
-        const talla = document.getElementById('tallaSelect').value;
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
 
         let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
-        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color, talla, contraentrega: true });
+        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '', contraentrega: true });
         localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
         window.location.href = '/carrito';
     }
