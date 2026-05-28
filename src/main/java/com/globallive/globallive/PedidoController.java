@@ -5,16 +5,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Controller
 public class PedidoController {
 
     private final PedidoRepository pedidoRepository;
     private final EmailService emailService;
+    private final MensajeRepository mensajeRepository;
 
-    public PedidoController(PedidoRepository pedidoRepository, EmailService emailService) {
+    public PedidoController(PedidoRepository pedidoRepository, EmailService emailService, MensajeRepository mensajeRepository) {
         this.pedidoRepository = pedidoRepository;
         this.emailService = emailService;
+        this.mensajeRepository = mensajeRepository;
     }
 
     @PostMapping("/api/pedido")
@@ -24,18 +27,13 @@ public class PedidoController {
         pedido.setCodigo("GL-" + System.currentTimeMillis());
         pedidoRepository.save(pedido);
 
-        // Enviar correo de confirmación
         if (pedido.getEmail() != null && !pedido.getEmail().isEmpty()) {
             try {
                 emailService.enviarConfirmacion(
-                        pedido.getEmail(),
-                        pedido.getNombreCliente(),
-                        pedido.getProductos(),
-                        pedido.getTotal()
+                        pedido.getEmail(), pedido.getNombreCliente(),
+                        pedido.getProductos(), pedido.getTotal()
                 );
-            } catch (Exception e) {
-                // Si falla el correo, no afecta el pedido
-            }
+            } catch (Exception e) {}
         }
 
         Map<String, String> response = new HashMap<>();
@@ -63,14 +61,6 @@ public class PedidoController {
             response.put("numeroGuia", pedido.getNumeroGuia());
         }
         return response;
-    }
-    private final MensajeRepository mensajeRepository;
-
-    // Actualiza el constructor para incluir MensajeRepository
-    public PedidoController(PedidoRepository pedidoRepository, EmailService emailService, MensajeRepository mensajeRepository) {
-        this.pedidoRepository = pedidoRepository;
-        this.emailService = emailService;
-        this.mensajeRepository = mensajeRepository;
     }
 
     @PostMapping("/api/chat/enviar")
