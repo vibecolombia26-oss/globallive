@@ -1,21 +1,19 @@
 package com.globallive.globallive;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String fromEmail;
-
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    private static final String API_KEY = "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";
+    private static final String FROM_EMAIL = "contacto@globalive.shop";
+    private static final String FROM_NAME = "GlobalLive";
 
     public void enviarConfirmacion(String to, String nombre, String productos, double total) {
         String asunto = "✅ Pedido Confirmado - GlobalLive";
@@ -36,15 +34,20 @@ public class EmailService {
 
     private void enviarCorreo(String to, String asunto, String cuerpo) {
         new Thread(() -> {
+            Email from = new Email(FROM_EMAIL, FROM_NAME);
+            Email toEmail = new Email(to);
+            Content content = new Content("text/plain", cuerpo);
+            Mail mail = new Mail(from, asunto, toEmail, content);
+
+            SendGrid sg = new SendGrid(API_KEY);
+            Request request = new Request();
             try {
-                SimpleMailMessage mensaje = new SimpleMailMessage();
-                mensaje.setFrom(fromEmail);
-                mensaje.setTo(to);
-                mensaje.setSubject(asunto);
-                mensaje.setText(cuerpo);
-                mailSender.send(mensaje);
-                System.out.println("✅ Correo enviado a: " + to);
-            } catch (Exception e) {
+                request.setMethod(Method.POST);
+                request.setEndpoint("mail/send");
+                request.setBody(mail.build());
+                Response response = sg.api(request);
+                System.out.println("✅ Correo enviado a: " + to + " | Status: " + response.getStatusCode());
+            } catch (IOException e) {
                 System.out.println("❌ Error enviando correo: " + e.getMessage());
             }
         }).start();
