@@ -89,4 +89,9 @@ public class PedidoController {
         }
         return List.of();
     }
+    @GetMapping("/api/chat/todos")
+    @ResponseBody
+    public List<Mensaje> obtenerTodosMensajes() {
+        return mensajeRepository.findAll();
+    }
 }

@@ -63,10 +63,7 @@
         <div class="info-section">
             <h1 class="nombre" th:text="${producto.nombre}">Nombre</h1>
             <div class="precio" th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 0, 'POINT')}">Precio</div>
-            <div class="meta">
-                <span class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</span>
-                <span class="categoria" th:text="${producto.categoria}">Categoría</span>
-            </div>
+            <div class="meta"><span class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</span><span class="categoria" th:text="${producto.categoria}">Categoría</span></div>
             <div class="especificaciones" th:if="${producto.largo != null}">
                 <div class="esp-item"><div class="esp-label">Largo</div><div class="esp-value" th:text="${producto.largo}">-</div></div>
                 <div class="esp-item"><div class="esp-label">Ancho</div><div class="esp-value" th:text="${producto.ancho}">-</div></div>
@@ -86,11 +83,7 @@
                 <button class="btn-contraentrega" onclick="comprarContraEntrega()">Pagar contra entrega</button>
                 <p class="acciones-hint">Carrito para pago electrónico · Contra entrega para pagar al recibir</p>
             </div>
-            <div class="banner-pago">
-                <div class="icono">💚</div>
-                <h3>Pago contra entrega</h3>
-                <p>Recibe tu producto y <span class="destacado">pagas al recibirlo</span>. Envío <span class="destacado">GRATIS</span></p>
-            </div>
+            <div class="banner-pago"><div class="icono">💚</div><h3>Pago contra entrega</h3><p>Recibe tu producto y <span class="destacado">pagas al recibirlo</span>. Envío <span class="destacado">GRATIS</span></p></div>
         </div>
     </div>
 </div>
@@ -99,10 +92,7 @@
 <div id="chatFloating" style="position:fixed; bottom:20px; right:20px; z-index:999;">
     <button onclick="toggleChat()" style="background:#4CAF50; color:#000; border:none; width:60px; height:60px; border-radius:50%; font-size:1.5rem; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.5);">💬</button>
     <div id="chatBox" style="display:none; position:absolute; bottom:70px; right:0; width:380px; background:#1a1a1a; border:1px solid #4CAF50; border-radius:16px; overflow:hidden;">
-        <div style="background:#4CAF50; color:#000; padding:15px; display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0; font-size:1rem;">💬 GlobalLive</h3>
-            <button onclick="toggleChat()" style="background:none; border:none; color:#000; font-size:1.2rem; cursor:pointer;">✕</button>
-        </div>
+        <div style="background:#4CAF50; color:#000; padding:15px; display:flex; justify-content:space-between; align-items:center;"><h3 style="margin:0; font-size:1rem;">💬 GlobalLive</h3><button onclick="toggleChat()" style="background:none; border:none; color:#000; font-size:1.2rem; cursor:pointer;">✕</button></div>
         <div id="chatLogin" style="padding:20px;">
             <p style="color:#888; font-size:0.8rem; margin-bottom:10px;">Ingresa tu código de seguimiento o celular</p>
             <input type="text" id="chatCodigoInput" placeholder="Código o celular..." style="width:100%; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; margin-bottom:10px;">
@@ -122,44 +112,17 @@
 
 <script>
     var precioBase = 0;
-    window.onload = function() {
-        var precioTexto = document.querySelector('.precio').textContent;
-        precioTexto = precioTexto.replace('$', '').replace(/\./g, '').replace(/,/g, '').trim();
-        precioBase = parseInt(precioTexto) || 0;
-    };
+    window.onload = function() { var precioTexto = document.querySelector('.precio').textContent; precioTexto = precioTexto.replace('$', '').replace(/\./g, '').replace(/,/g, '').trim(); precioBase = parseInt(precioTexto) || 0; };
     function cambiarCantidad(delta) { const input = document.getElementById('cantidad'); let val = parseInt(input.value) || 1; val = Math.max(1, val + delta); input.value = val; actualizarSubtotal(); }
     function actualizarSubtotal() { const cantidad = parseInt(document.getElementById('cantidad').value) || 1; const subtotal = precioBase * cantidad; document.getElementById('subtotalDisplay').innerHTML = '= $' + subtotal.toLocaleString('es-CO'); }
-    function agregarAlCarrito() {
-        const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '' }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
-        const btn = document.querySelector('.btn-carrito'); btn.textContent = '✓ Agregado';
-        setTimeout(() => { if (confirm('¿Ver carrito?')) window.location.href = '/carrito'; else btn.textContent = 'Agregar al carrito'; }, 500);
-    }
-    function comprarContraEntrega() {
-        const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '', contraentrega: true }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
-        window.location.href = '/carrito';
-    }
+    function agregarAlCarrito() { const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1; let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '' }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito)); const btn = document.querySelector('.btn-carrito'); btn.textContent = '✓ Agregado'; setTimeout(() => { if (confirm('¿Ver carrito?')) window.location.href = '/carrito'; else btn.textContent = 'Agregar al carrito'; }, 500); }
+    function comprarContraEntrega() { const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1; let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '', contraentrega: true }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito)); window.location.href = '/carrito'; }
 
     var chatCodigo = '';
     function toggleChat() { var box = document.getElementById('chatBox'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
-    function iniciarChat() {
-        var codigo = document.getElementById('chatCodigoInput').value.trim(); if (!codigo) return; document.getElementById('chatError').textContent = '';
-        fetch('/api/pedido/' + codigo).then(r => r.json()).then(data => {
-            if (data.error) { document.getElementById('chatError').textContent = data.error; }
-            else { chatCodigo = data.codigo; document.getElementById('chatLogin').style.display = 'none'; document.getElementById('chatContent').style.display = 'flex'; document.getElementById('chatPedidoInfo').innerHTML = '<strong style="color:#4CAF50;">📦 ' + data.codigo + '</strong> | Estado: ' + data.estado + (data.transportadora ? ' | 🚚 ' + data.transportadora + ' - ' + data.numeroGuia : ''); cargarMensajesChat(); }
-        });
-    }
-    function cargarMensajesChat() {
-        fetch('/api/chat/mensajes?codigo=' + chatCodigo).then(r => r.json()).then(mensajes => {
-            var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div style="align-self:flex-end; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.mensaje + '</div>'; if (m.respuesta) html += '<div style="align-self:flex-start; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.respuesta + '</div>'; } });
-            document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666; text-align:center;">Envía un mensaje para recibir ayuda</p>'; document.getElementById('chatMensajes').scrollTop = document.getElementById('chatMensajes').scrollHeight;
-        });
-    }
-    function enviarMensajeChat() {
-        var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return;
-        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:'', mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); });
-    }
+    function iniciarChat() { var codigo = document.getElementById('chatCodigoInput').value.trim(); if (!codigo) return; document.getElementById('chatError').textContent = ''; fetch('/api/pedido/' + codigo).then(r => r.json()).then(data => { if (data.error) { document.getElementById('chatError').textContent = data.error; } else { chatCodigo = data.codigo; document.getElementById('chatLogin').style.display = 'none'; document.getElementById('chatContent').style.display = 'flex'; document.getElementById('chatPedidoInfo').innerHTML = '<strong style="color:#4CAF50;">📦 ' + data.codigo + '</strong> | Estado: ' + data.estado + (data.transportadora ? ' | 🚚 ' + data.transportadora + ' - ' + data.numeroGuia : ''); cargarMensajesChat(); } }); }
+    function cargarMensajesChat() { fetch('/api/chat/mensajes?codigo=' + chatCodigo).then(r => r.json()).then(mensajes => { var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div style="align-self:flex-end; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.mensaje + '</div>'; if (m.respuesta) html += '<div style="align-self:flex-start; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.respuesta + '</div>'; } }); document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666; text-align:center;">Envía un mensaje para recibir ayuda</p>'; document.getElementById('chatMensajes').scrollTop = document.getElementById('chatMensajes').scrollHeight; }); setTimeout(cargarMensajesChat, 3000); }
+    function enviarMensajeChat() { var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return; fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:'', mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); }); }
 
     actualizarSubtotal();
     const bg = document.getElementById('bgAnimado'); const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];

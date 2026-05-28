@@ -13,10 +13,12 @@
         .btn { padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:500; transition:all 0.3s; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; }
         .btn-back { background:transparent; color:#4CAF50; border:1px solid #4CAF50; }
         .chat-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:20px; margin-bottom:15px; }
-        .chat-header { display:flex; justify-content:space-between; margin-bottom:10px; color:#4CAF50; font-weight:600; }
-        .chat-mensaje { padding:10px; margin:5px 0; border-radius:12px; font-size:0.9rem; }
-        .cliente { background:#4CAF50; color:#000; text-align:right; }
-        .respuesta { background:#333; color:#fff; text-align:left; }
+        .chat-header { display:flex; justify-content:space-between; margin-bottom:10px; color:#4CAF50; font-weight:600; flex-wrap:wrap; gap:10px; }
+        .chat-mensajes { max-height:250px; overflow-y:auto; margin-bottom:10px; }
+        .msg-cliente { text-align:right; margin:5px 0; }
+        .msg-cliente span { display:inline-block; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem; }
+        .msg-respuesta { text-align:left; margin:5px 0; }
+        .msg-respuesta span { display:inline-block; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem; }
         .responder-form { display:flex; gap:10px; margin-top:10px; }
         .responder-form input { flex:1; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; }
         .responder-form button { background:#4CAF50; color:#000; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:600; }
@@ -28,19 +30,68 @@
         <h1>💬 Chats</h1>
         <a th:href="@{/admin/panel(key=${key})}" class="btn btn-back">← Panel</a>
     </div>
-    <div th:each="msg : ${mensajes}">
-        <div class="chat-card" th:if="${msg.respuesta == null}">
-            <div class="chat-header">
-                <span th:text="${msg.codigoPedido}"></span>
-                <span th:text="${#temporals.format(msg.fecha, 'dd/MM HH:mm')}"></span>
-            </div>
-            <div class="chat-mensaje cliente" th:text="${msg.mensaje}"></div>
-            <form class="responder-form" th:action="@{/admin/responder/{id}(id=${msg.id}, key=${key})}" method="post">
-                <input type="text" name="respuesta" placeholder="Responder..." required>
-                <button type="submit">Enviar</button>
-            </form>
-        </div>
+    <div id="chatsContainer">
+        <p style="text-align:center; color:#666;">Cargando mensajes...</p>
     </div>
 </div>
+
+<script th:inline="javascript">
+    var key = /*[[${key}]]*/ '';
+
+    function cargarChats() {
+        fetch('/api/chat/todos')
+            .then(r => r.json())
+            .then(mensajes => {
+                var agrupados = {};
+                mensajes.forEach(function(m) {
+                    if (!agrupados[m.codigoPedido]) agrupados[m.codigoPedido] = [];
+                    agrupados[m.codigoPedido].push(m);
+                });
+
+                var html = '';
+                for (var codigo in agrupados) {
+                    var msgs = agrupados[codigo];
+                    var ultimo = msgs[msgs.length - 1];
+                    var sinResponder = msgs.filter(function(m) { return m.esCliente && !m.respuesta; }).length;
+
+                    html += '<div class="chat-card">';
+                    html += '<div class="chat-header">';
+                    html += '<span>📦 ' + codigo + (sinResponder > 0 ? ' <span style="color:#ffc107;">(' + sinResponder + ' pendientes)</span>' : '');
+                    html += '</span></div>';
+                    html += '<div class="chat-mensajes">';
+                    msgs.forEach(function(m) {
+                        if (m.esCliente) {
+                            html += '<div class="msg-cliente"><span>' + m.mensaje + '</span></div>';
+                            if (m.respuesta) html += '<div class="msg-respuesta"><span>' + m.respuesta + '</span></div>';
+                        }
+                    });
+                    html += '</div>';
+                    if (sinResponder > 0) {
+                        html += '<div class="responder-form">';
+                        html += '<input type="text" id="resp_' + msgs[0].id + '" placeholder="Escribe una respuesta...">';
+                        html += '<button onclick="responder(' + msgs[0].id + ')">Enviar</button>';
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                }
+                document.getElementById('chatsContainer').innerHTML = html || '<p style="text-align:center; color:#666;">No hay mensajes</p>';
+            });
+    }
+
+    function responder(msgId) {
+        var input = document.getElementById('resp_' + msgId);
+        var respuesta = input.value.trim();
+        if (!respuesta) return;
+
+        fetch('/admin/responder/' + msgId + '?key=' + key + '&respuesta=' + encodeURIComponent(respuesta))
+            .then(function() {
+                input.value = '';
+                cargarChats();
+            });
+    }
+
+    cargarChats();
+    setInterval(cargarChats, 3000);
+</script>
 </body>
 </html>
