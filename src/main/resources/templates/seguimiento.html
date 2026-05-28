@@ -83,20 +83,46 @@
             fetch('/api/chat/mensajes?telefono=' + telefonoActual)
                 .then(r => r.json())
                 .then(mensajes => {
+                    document.getElementById('resultado').style.display = 'none';
                     if (mensajes.length > 0) {
                         codigoActual = mensajes[0].codigoPedido;
                         document.getElementById('errorMsg').textContent = '';
-                        document.getElementById('resultado').style.display = 'none';
                         document.getElementById('chatContainer').style.display = 'block';
                         cargarMensajes();
                     } else {
-                        document.getElementById('errorMsg').textContent = 'No se encontraron mensajes';
-                        document.getElementById('resultado').style.display = 'none';
+                        document.getElementById('errorMsg').textContent = 'No se encontró el pedido. Verifica el número.';
                         document.getElementById('chatContainer').style.display = 'none';
                     }
                 });
             return;
         }
+
+        codigoActual = codigo;
+        fetch('/api/pedido/' + codigo)
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('errorMsg').textContent = data.error;
+                    document.getElementById('resultado').style.display = 'none';
+                    document.getElementById('chatContainer').style.display = 'none';
+                } else {
+                    document.getElementById('errorMsg').textContent = '';
+                    document.getElementById('resultado').style.display = 'block';
+                    document.getElementById('rCodigo').textContent = data.codigo;
+                    document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
+                    document.getElementById('rProductos').textContent = data.productos;
+                    if (data.transportadora) {
+                        document.getElementById('rTransportadora').textContent = data.transportadora;
+                        document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente';
+                        document.getElementById('infoEnvio').style.display = 'block';
+                    } else {
+                        document.getElementById('infoEnvio').style.display = 'none';
+                    }
+                    document.getElementById('chatContainer').style.display = 'block';
+                    cargarMensajes();
+                }
+            });
+    }
 
         codigoActual = codigo;
         fetch('/api/pedido/' + codigo)
