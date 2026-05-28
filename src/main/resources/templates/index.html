@@ -119,11 +119,15 @@
             var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div style="align-self:flex-end; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.mensaje + '</div>'; if (m.respuesta) html += '<div style="align-self:flex-start; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.respuesta + '</div>'; } });
             document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666; text-align:center;">Envía un mensaje para recibir ayuda</p>';
             document.getElementById('chatMensajes').scrollTop = document.getElementById('chatMensajes').scrollHeight;
-            if (chatInput && textoActual.length > 0) { chatInput.value = textoActual; chatInput.focus(); }
+            if (chatInput && textoActual.length > 0) { chatInput.value = textoActual; }
         });
         setTimeout(cargarMensajesChat, 3000);
     }
-    function enviarMensajeChat() { var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return; fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:'', mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); }); }
+    function enviarMensajeChat() {
+        var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return;
+        var telefono = document.getElementById('chatCodigoInput').value;
+        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:telefono, mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); });
+    }
     const bg = document.getElementById('bgAnimado'); const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
     for (let i = 0; i < 30; i++) { const el = document.createElement('div'); el.className = 'molecula'; el.textContent = iconos[Math.floor(Math.random()*iconos.length)]; el.style.cssText = 'left:'+Math.random()*95+'%;font-size:'+(Math.random()*2+1)+'rem;animation-duration:'+(Math.random()*20+15)+'s;animation-delay:'+Math.random()*10+'s;'; bg.appendChild(el); }
     function agregarAlCarrito(nombre, precio, imagen) { let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio, imagen, cantidad: 1, color: '', talla: '' }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito)); actualizarContador(); alert('✅ ¡Agregado al carrito!'); }

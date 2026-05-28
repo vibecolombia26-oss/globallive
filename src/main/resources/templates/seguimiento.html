@@ -79,6 +79,7 @@
             } else {
                 var telefono = codigo.replace(/[^0-9]/g, '');
                 if (telefono.length >= 10) {
+                    telefonoActual = telefono;
                     fetch('/api/chat/mensajes?telefono=' + telefono).then(r => r.json()).then(mensajes => {
                         document.getElementById('resultado').style.display = 'none';
                         if (mensajes.length > 0) { codigoActual = mensajes[0].codigoPedido; document.getElementById('errorMsg').textContent = ''; document.getElementById('chatContainer').style.display = 'block'; cargarMensajes(); }
@@ -93,11 +94,14 @@
         fetch('/api/chat/mensajes?codigo=' + (codigoActual || '')).then(r => r.json()).then(mensajes => {
             var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div class="msg-cliente"><div>' + m.mensaje + '</div></div>'; if (m.respuesta) html += '<div class="msg-respuesta"><div>' + m.respuesta + '</div></div>'; } });
             document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666;">No hay mensajes aún</p>';
-            if (chatInput && textoActual.length > 0) { chatInput.value = textoActual; chatInput.focus(); }
+            if (chatInput && textoActual.length > 0) { chatInput.value = textoActual; }
         });
         setTimeout(cargarMensajes, 3000);
     }
-    function enviarMensaje() { var mensaje = document.getElementById('chatInput').value.trim(); if (!mensaje) return; fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:codigoActual, telefono:telefonoActual, mensaje:mensaje}) }).then(function() { document.getElementById('chatInput').value = ''; cargarMensajes(); }); }
+    function enviarMensaje() {
+        var mensaje = document.getElementById('chatInput').value.trim(); if (!mensaje) return;
+        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:codigoActual, telefono:telefonoActual || document.getElementById('codigoInput').value, mensaje:mensaje}) }).then(function() { document.getElementById('chatInput').value = ''; cargarMensajes(); });
+    }
     function enviarPregunta(pregunta) { document.getElementById('chatInput').value = pregunta; enviarMensaje(); }
 </script>
 </body>
