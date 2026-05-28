@@ -159,7 +159,50 @@
     </div>
     <p class="footer-copy">GlobalLive &copy; 2026 · Salud & Bienestar</p>
 </footer>
+
+<!-- CHAT FLOTANTE -->
+<div id="chatFloating" style="position:fixed; bottom:20px; right:20px; z-index:999;">
+    <button onclick="toggleChat()" style="background:#4CAF50; color:#000; border:none; width:60px; height:60px; border-radius:50%; font-size:1.5rem; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.5);">💬</button>
+    <div id="chatBox" style="display:none; position:absolute; bottom:70px; right:0; width:350px; background:#1a1a1a; border:1px solid #4CAF50; border-radius:16px; padding:20px; max-height:400px; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="color:#4CAF50; margin:0;">💬 Consulta tu pedido</h3>
+            <button onclick="toggleChat()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+        </div>
+        <p style="color:#888; font-size:0.8rem; margin-bottom:10px;">Ingresa tu código o celular para ver el estado y chatear</p>
+        <input type="text" id="chatCodigoInput" placeholder="Código o celular..." style="width:100%; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; margin-bottom:10px;">
+        <button onclick="buscarDesdeChat()" style="width:100%; padding:10px; background:#4CAF50; color:#000; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Consultar</button>
+        <div id="chatResultado" style="margin-top:10px; font-size:0.8rem;"></div>
+    </div>
+</div>
+
 <script>
+    function toggleChat() {
+        var box = document.getElementById('chatBox');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function buscarDesdeChat() {
+        var codigo = document.getElementById('chatCodigoInput').value.trim();
+        if (!codigo) return;
+        fetch('/api/pedido/' + codigo)
+            .then(r => r.json())
+            .then(data => {
+                var html = '';
+                if (data.error) {
+                    html = '<p style="color:#ff4444;">' + data.error + '</p>';
+                } else {
+                    html = '<div style="background:#111; padding:10px; border-radius:8px;">';
+                    html += '<p style="color:#4CAF50;">📦 ' + data.codigo + '</p>';
+                    html += '<p>Estado: <strong>' + data.estado + '</strong></p>';
+                    html += '<p style="color:#888; font-size:0.75rem;">' + data.productos + '</p>';
+                    if (data.transportadora) html += '<p>🚚 ' + data.transportadora + ' - Guía: ' + data.numeroGuia + '</p>';
+                    html += '</div>';
+                    html += '<p style="margin-top:10px;"><a href="/seguimiento" style="color:#4CAF50;">Ver más y chatear →</a></p>';
+                }
+                document.getElementById('chatResultado').innerHTML = html;
+            });
+    }
+
     const bg = document.getElementById('bgAnimado');
     const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
     for (let i = 0; i < 30; i++) {
@@ -169,6 +212,7 @@
         el.style.cssText = 'left:'+Math.random()*95+'%;font-size:'+(Math.random()*2+1)+'rem;animation-duration:'+(Math.random()*20+15)+'s;animation-delay:'+Math.random()*10+'s;';
         bg.appendChild(el);
     }
+
     function agregarAlCarrito(nombre, precio, imagen) {
         let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
         carrito.push({ nombre, precio, imagen, cantidad: 1, color: '', talla: '' });
@@ -176,6 +220,7 @@
         actualizarContador();
         alert('✅ ¡Agregado al carrito!');
     }
+
     function actualizarContador() {
         const carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
         const countEl = document.getElementById('cartCount');
