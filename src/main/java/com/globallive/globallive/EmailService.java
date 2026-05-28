@@ -4,6 +4,7 @@ import com.sendgrid.*;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,7 +12,9 @@ import java.io.IOException;
 @Service
 public class EmailService {
 
-    private static final String API_KEY = "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";
+    @Value("${sendgrid.api.key}")
+    private String apiKey;
+
     private static final String FROM_EMAIL = "contacto@globalive.shop";
     private static final String FROM_NAME = "GlobalLive";
 
@@ -39,7 +42,7 @@ public class EmailService {
             Content content = new Content("text/plain", cuerpo);
             Mail mail = new Mail(from, asunto, toEmail, content);
 
-            SendGrid sg = new SendGrid(API_KEY);
+            SendGrid sg = new SendGrid(apiKey);
             Request request = new Request();
             try {
                 request.setMethod(Method.POST);
