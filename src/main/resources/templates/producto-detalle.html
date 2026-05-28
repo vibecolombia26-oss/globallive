@@ -10,77 +10,97 @@
         .bg-animated { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .molecula { position: absolute; animation: flotarMolecula linear infinite; opacity: 0.08; }
         @keyframes flotarMolecula { 0% { transform: translateY(105vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.1; } 90% { opacity: 0.05; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
-        .container { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 20px; }
         .back-btn { display: inline-block; color: #4CAF50; text-decoration: none; padding: 10px 20px; margin: 20px 0; border: 1px solid #4CAF50; border-radius: 25px; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; }
         .back-btn:hover { background: rgba(76,175,80,0.1); }
-        .producto-container { display: flex; flex-direction: column; gap: 30px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 30px; }
-        .imagenes { display: flex; flex-direction: column; gap: 15px; }
-        .imagen-principal { width: 100%; max-height: 500px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .imagenes-secundarias { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .imagen-secundaria { width: 70px; height: 70px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; object-fit: cover; transition: all 0.3s; filter: brightness(0.9); }
+
+        .producto-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; overflow: hidden; }
+
+        /* Imagen */
+        .imagen-principal { width: 100%; max-height: 450px; object-fit: cover; display: block; }
+        .imagenes-secundarias { display: flex; gap: 8px; justify-content: center; padding: 12px; background: rgba(0,0,0,0.3); }
+        .imagen-secundaria { width: 60px; height: 60px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; object-fit: cover; transition: all 0.3s; filter: brightness(0.9); }
         .imagen-secundaria:hover { border-color: #4CAF50; filter: brightness(1); }
-        .info h1 { font-size: 2rem; font-weight: 300; margin-bottom: 15px; color: #fff; letter-spacing: 2px; text-align: center; }
-        .precio { font-size: 2.8rem; font-weight: 600; color: #4CAF50; margin: 15px 0; text-align: center; }
-        .sku { color: #4CAF50; font-size: 0.85rem; margin-bottom: 10px; font-weight: 500; text-align: center; }
-        .categoria { display: inline-block; background: rgba(76,175,80,0.1); color: #4CAF50; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; border: 1px solid rgba(76,175,80,0.2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-        .categoria-wrap { text-align: center; margin-bottom: 15px; }
-        .descripcion { color: #aaa; line-height: 1.8; margin: 20px 0; font-size: 0.95rem; text-align: center; }
-        .medidas { background: rgba(76,175,80,0.03); border: 1px solid rgba(76,175,80,0.15); border-radius: 12px; padding: 15px; margin: 20px auto; max-width: 400px; }
-        .medidas h3 { color: #4CAF50; margin-bottom: 10px; font-weight: 400; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; }
-        .medidas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .medida-item { color: #888; font-size: 0.85rem; }
-        .medida-item span { color: #ccc; }
-        .cantidad-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; background: rgba(76,175,80,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(76,175,80,0.15); }
+
+        /* Info */
+        .info-section { padding: 30px; }
+        .nombre { font-size: 1.8rem; font-weight: 300; color: #fff; letter-spacing: 1px; margin-bottom: 10px; }
+        .precio { font-size: 2.5rem; font-weight: 600; color: #4CAF50; margin-bottom: 10px; }
+        .meta { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .sku { color: #4CAF50; font-size: 0.85rem; }
+        .categoria { background: rgba(76,175,80,0.1); color: #4CAF50; padding: 4px 12px; border-radius: 15px; font-size: 0.75rem; border: 1px solid rgba(76,175,80,0.2); text-transform: uppercase; }
+
+        /* Especificaciones */
+        .especificaciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; padding: 15px; background: rgba(76,175,80,0.03); border: 1px solid rgba(76,175,80,0.1); border-radius: 10px; text-align: center; }
+        .esp-item .esp-label { color: #888; font-size: 0.7rem; text-transform: uppercase; }
+        .esp-item .esp-value { color: #fff; font-size: 0.95rem; font-weight: 500; }
+
+        .descripcion { color: #aaa; line-height: 1.8; font-size: 0.9rem; margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 10px; }
+
+        /* Cantidad */
+        .cantidad-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; padding: 15px; background: rgba(76,175,80,0.03); border-radius: 12px; border: 1px solid rgba(76,175,80,0.15); }
         .cantidad-row label { color: #888; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .qty-btn { background: transparent; color: #4CAF50; border: 1px solid #4CAF50; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; }
         .qty-btn:hover { background: #4CAF50; color: #000; }
         .qty-input { width: 55px; text-align: center; background: #111; color: #fff; border: 1px solid #333; padding: 8px; border-radius: 6px; font-size: 0.95rem; }
-        .subtotal-display { color: #4CAF50; font-weight: 600; font-size: 1.2rem; }
-        .acciones { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
+        .subtotal-display { color: #4CAF50; font-weight: 600; font-size: 1.1rem; }
+
+        /* Botones */
+        .acciones { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .btn-carrito { width: 100%; padding: 16px; text-align: center; background: #4CAF50; color: #000; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; }
         .btn-carrito:hover { box-shadow: 0 0 30px rgba(76,175,80,0.4); }
         .btn-contraentrega { width: 100%; padding: 16px; text-align: center; background: transparent; color: #fff; font-size: 0.95rem; font-weight: 600; border: 2px solid #fff; border-radius: 25px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 2px; }
         .btn-contraentrega:hover { background: #fff; color: #000; }
-        .banner-pago { background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px; }
-        .banner-pago .icono { font-size: 2rem; }
-        .banner-pago h3 { color: #4CAF50; font-size: 1rem; margin: 8px 0; font-weight: 500; }
-        .banner-pago p { color: #888; font-size: 0.85rem; line-height: 1.6; }
+        .acciones-hint { text-align: center; color: #666; font-size: 0.7rem; margin-top: 5px; }
+
+        .banner-pago { background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); border-radius: 12px; padding: 15px; text-align: center; margin-top: 15px; }
+        .banner-pago .icono { font-size: 1.5rem; }
+        .banner-pago h3 { color: #4CAF50; font-size: 0.9rem; margin: 5px 0; font-weight: 500; }
+        .banner-pago p { color: #888; font-size: 0.8rem; }
         .banner-pago .destacado { color: #fff; font-weight: 600; }
+
+        @media (max-width: 500px) {
+            .especificaciones { grid-template-columns: repeat(2, 1fr); }
+            .info-section { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 <div class="bg-animated" id="bgAnimado"></div>
 <div class="container">
     <a href="/" class="back-btn">← Volver</a>
-    <div class="producto-container">
-        <!-- Imagen arriba -->
-        <div class="imagenes">
-            <img class="imagen-principal" th:src="${producto.imagen1}" th:alt="${producto.nombre}" id="imgPrincipal">
-            <div class="imagenes-secundarias">
-                <img class="imagen-secundaria" th:src="${producto.imagen1}" onclick="document.getElementById('imgPrincipal').src=this.src">
-                <img class="imagen-secundaria" th:if="${producto.imagen2 != null}" th:src="${producto.imagen2}" onclick="document.getElementById('imgPrincipal').src=this.src">
-                <img class="imagen-secundaria" th:if="${producto.imagen3 != null}" th:src="${producto.imagen3}" onclick="document.getElementById('imgPrincipal').src=this.src">
-                <img class="imagen-secundaria" th:if="${producto.imagen4 != null}" th:src="${producto.imagen4}" onclick="document.getElementById('imgPrincipal').src=this.src">
-            </div>
+
+    <div class="producto-card">
+        <!-- Imagen -->
+        <img class="imagen-principal" th:src="${producto.imagen1}" th:alt="${producto.nombre}" id="imgPrincipal">
+        <div class="imagenes-secundarias" th:if="${producto.imagen2 != null or producto.imagen3 != null or producto.imagen4 != null}">
+            <img class="imagen-secundaria" th:src="${producto.imagen1}" onclick="document.getElementById('imgPrincipal').src=this.src">
+            <img class="imagen-secundaria" th:if="${producto.imagen2 != null}" th:src="${producto.imagen2}" onclick="document.getElementById('imgPrincipal').src=this.src">
+            <img class="imagen-secundaria" th:if="${producto.imagen3 != null}" th:src="${producto.imagen3}" onclick="document.getElementById('imgPrincipal').src=this.src">
+            <img class="imagen-secundaria" th:if="${producto.imagen4 != null}" th:src="${producto.imagen4}" onclick="document.getElementById('imgPrincipal').src=this.src">
         </div>
-        <!-- Info abajo -->
-        <div class="info">
-            <h1 th:text="${producto.nombre}">Nombre</h1>
+
+        <!-- Info -->
+        <div class="info-section">
+            <h1 class="nombre" th:text="${producto.nombre}">Nombre</h1>
             <div class="precio" th:text="'$' + ${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 0, 'POINT')}">Precio</div>
-            <div class="categoria-wrap">
-                <div class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</div>
+            <div class="meta">
+                <span class="sku" th:text="'Ref: ' + ${producto.sku}">SKU</span>
                 <span class="categoria" th:text="${producto.categoria}">Categoría</span>
             </div>
-            <p class="descripcion" th:text="${producto.descripcionLarga != null ? producto.descripcionLarga : producto.descripcion}">Descripción</p>
-            <div class="medidas" th:if="${producto.largo != null}">
-                <h3>Especificaciones</h3>
-                <div class="medidas-grid">
-                    <div class="medida-item">Largo: <span th:text="${producto.largo}">-</span></div>
-                    <div class="medida-item">Ancho: <span th:text="${producto.ancho}">-</span></div>
-                    <div class="medida-item">Alto: <span th:text="${producto.alto}">-</span></div>
-                    <div class="medida-item">Peso: <span th:text="${producto.peso}">-</span></div>
-                </div>
+
+            <!-- Especificaciones -->
+            <div class="especificaciones" th:if="${producto.largo != null}">
+                <div class="esp-item"><div class="esp-label">Largo</div><div class="esp-value" th:text="${producto.largo}">-</div></div>
+                <div class="esp-item"><div class="esp-label">Ancho</div><div class="esp-value" th:text="${producto.ancho}">-</div></div>
+                <div class="esp-item"><div class="esp-label">Alto</div><div class="esp-value" th:text="${producto.alto}">-</div></div>
+                <div class="esp-item"><div class="esp-label">Peso</div><div class="esp-value" th:text="${producto.peso}">-</div></div>
             </div>
+
+            <!-- Descripción -->
+            <div class="descripcion" th:text="${producto.descripcionLarga != null ? producto.descripcionLarga : producto.descripcion}">Descripción</div>
+
+            <!-- Cantidad -->
             <div class="cantidad-row">
                 <label>Cantidad</label>
                 <button class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
@@ -88,20 +108,23 @@
                 <button class="qty-btn" onclick="cambiarCantidad(1)">+</button>
                 <span class="subtotal-display" id="subtotalDisplay">= $<span th:text="${#numbers.formatDecimal(producto.precio, 0, 'COMMA', 0, 'POINT')}">0</span></span>
             </div>
+
+            <!-- Botones -->
             <div class="acciones">
                 <button class="btn-carrito" onclick="agregarAlCarrito()">Agregar al carrito</button>
                 <button class="btn-contraentrega" onclick="comprarContraEntrega()">Pagar contra entrega</button>
-                <p style="text-align:center;color:#666;font-size:0.75rem;margin-top:5px;">Carrito para pago electrónico · Contra entrega para pagar al recibir</p>
+                <p class="acciones-hint">Carrito para pago electrónico · Contra entrega para pagar al recibir</p>
             </div>
+
             <div class="banner-pago">
                 <div class="icono">💚</div>
                 <h3>Pago contra entrega</h3>
-                <p>Recibe tu producto y <span class="destacado">pagas al recibirlo</span>.</p>
-                <p style="margin-top:8px;">Envío <span class="destacado">GRATIS</span> a todo Colombia</p>
+                <p>Recibe tu producto y <span class="destacado">pagas al recibirlo</span>. Envío <span class="destacado">GRATIS</span></p>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     var precioBase = 0;
     window.onload = function() {
@@ -125,7 +148,7 @@
     }
 
     function agregarAlCarrito() {
-        const nombre = document.querySelector('.info h1').textContent.trim();
+        const nombre = document.querySelector('.nombre').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
 
@@ -142,7 +165,7 @@
     }
 
     function comprarContraEntrega() {
-        const nombre = document.querySelector('.info h1').textContent.trim();
+        const nombre = document.querySelector('.nombre').textContent.trim();
         const imagen = document.getElementById('imgPrincipal')?.src || '';
         const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
 
