@@ -19,8 +19,6 @@
         .estado { display:inline-block; padding:5px 15px; border-radius:20px; font-size:0.8rem; font-weight:600; }
         .estado-pendiente { background:rgba(255,193,7,0.15); color:#ffc107; }
         .error { color:#ff4444; margin-top:10px; }
-
-        /* Chat */
         .chat-container { display:none; margin-top:20px; background:rgba(255,255,255,0.03); border:1px solid rgba(76,175,80,0.3); border-radius:16px; padding:20px; text-align:left; }
         .chat-container h3 { color:#4CAF50; margin-bottom:15px; }
         .preguntas { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
@@ -51,8 +49,6 @@
             <div class="label" style="margin-top:8px;">📋 Número de Guía</div><div class="value" id="rGuia"></div>
         </div>
     </div>
-
-    <!-- CHAT -->
     <div class="chat-container" id="chatContainer">
         <h3>💬 ¿Necesitas ayuda?</h3>
         <div class="preguntas">
@@ -71,119 +67,43 @@
 <script>
     var codigoActual = '';
     var telefonoActual = '';
-
     function buscarPedido() {
         var codigo = document.getElementById('codigoInput').value.trim();
         if (!codigo) { document.getElementById('errorMsg').textContent = 'Ingresa un código o teléfono'; return; }
-
         var esTelefono = codigo.replace(/[^0-9]/g, '').length >= 10;
-
         if (esTelefono) {
             telefonoActual = codigo.replace(/[^0-9]/g, '');
-            fetch('/api/chat/mensajes?telefono=' + telefonoActual)
-                .then(r => r.json())
-                .then(mensajes => {
-                    document.getElementById('resultado').style.display = 'none';
-                    if (mensajes.length > 0) {
-                        codigoActual = mensajes[0].codigoPedido;
-                        document.getElementById('errorMsg').textContent = '';
-                        document.getElementById('chatContainer').style.display = 'block';
-                        cargarMensajes();
-                    } else {
-                        document.getElementById('errorMsg').textContent = 'No se encontró el pedido. Verifica el número.';
-                        document.getElementById('chatContainer').style.display = 'none';
-                    }
-                });
+            fetch('/api/chat/mensajes?telefono=' + telefonoActual).then(r => r.json()).then(mensajes => {
+                document.getElementById('resultado').style.display = 'none';
+                if (mensajes.length > 0) { codigoActual = mensajes[0].codigoPedido; document.getElementById('errorMsg').textContent = ''; document.getElementById('chatContainer').style.display = 'block'; cargarMensajes(); }
+                else { document.getElementById('errorMsg').textContent = 'No se encontró el pedido. Verifica el número.'; document.getElementById('chatContainer').style.display = 'none'; }
+            });
             return;
         }
-
         codigoActual = codigo;
-        fetch('/api/pedido/' + codigo)
-            .then(r => r.json())
-            .then(data => {
-                if (data.error) {
-                    document.getElementById('errorMsg').textContent = data.error;
-                    document.getElementById('resultado').style.display = 'none';
-                    document.getElementById('chatContainer').style.display = 'none';
-                } else {
-                    document.getElementById('errorMsg').textContent = '';
-                    document.getElementById('resultado').style.display = 'block';
-                    document.getElementById('rCodigo').textContent = data.codigo;
-                    document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
-                    document.getElementById('rProductos').textContent = data.productos;
-                    if (data.transportadora) {
-                        document.getElementById('rTransportadora').textContent = data.transportadora;
-                        document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente';
-                        document.getElementById('infoEnvio').style.display = 'block';
-                    } else {
-                        document.getElementById('infoEnvio').style.display = 'none';
-                    }
-                    document.getElementById('chatContainer').style.display = 'block';
-                    cargarMensajes();
-                }
-            });
-    }
-
-        codigoActual = codigo;
-        fetch('/api/pedido/' + codigo)
-            .then(r => r.json())
-            .then(data => {
-                if (data.error) {
-                    document.getElementById('errorMsg').textContent = data.error;
-                    document.getElementById('resultado').style.display = 'none';
-                    document.getElementById('chatContainer').style.display = 'none';
-                } else {
-                    document.getElementById('errorMsg').textContent = '';
-                    document.getElementById('resultado').style.display = 'block';
-                    document.getElementById('rCodigo').textContent = data.codigo;
-                    document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
-                    document.getElementById('rProductos').textContent = data.productos;
-                    if (data.transportadora) {
-                        document.getElementById('rTransportadora').textContent = data.transportadora;
-                        document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente';
-                        document.getElementById('infoEnvio').style.display = 'block';
-                    }
-                    document.getElementById('chatContainer').style.display = 'block';
-                    cargarMensajes();
-                }
-            });
-    }
-
-    function cargarMensajes() {
-        var url = '/api/chat/mensajes?codigo=' + (codigoActual || '');
-        fetch(url)
-            .then(r => r.json())
-            .then(mensajes => {
-                var html = '';
-                mensajes.forEach(function(m) {
-                    if (m.esCliente) {
-                        html += '<div class="msg-cliente"><div>' + m.mensaje + '</div></div>';
-                        if (m.respuesta) {
-                            html += '<div class="msg-respuesta"><div>' + m.respuesta + '</div></div>';
-                        }
-                    }
-                });
-                document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666;">No hay mensajes aún</p>';
-            });
-    }
-
-    function enviarMensaje() {
-        var mensaje = document.getElementById('chatInput').value.trim();
-        if (!mensaje) return;
-        fetch('/api/chat/enviar', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({codigo: codigoActual, telefono: telefonoActual, mensaje: mensaje})
-        }).then(function() {
-            document.getElementById('chatInput').value = '';
-            cargarMensajes();
+        fetch('/api/pedido/' + codigo).then(r => r.json()).then(data => {
+            if (data.error) { document.getElementById('errorMsg').textContent = data.error; document.getElementById('resultado').style.display = 'none'; document.getElementById('chatContainer').style.display = 'none'; }
+            else {
+                document.getElementById('errorMsg').textContent = ''; document.getElementById('resultado').style.display = 'block';
+                document.getElementById('rCodigo').textContent = data.codigo; document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data.estado + '</span>';
+                document.getElementById('rProductos').textContent = data.productos;
+                if (data.transportadora) { document.getElementById('rTransportadora').textContent = data.transportadora; document.getElementById('rGuia').textContent = data.numeroGuia || 'Pendiente'; document.getElementById('infoEnvio').style.display = 'block'; }
+                else { document.getElementById('infoEnvio').style.display = 'none'; }
+                document.getElementById('chatContainer').style.display = 'block'; cargarMensajes();
+            }
         });
     }
-
-    function enviarPregunta(pregunta) {
-        document.getElementById('chatInput').value = pregunta;
-        enviarMensaje();
+    function cargarMensajes() {
+        fetch('/api/chat/mensajes?codigo=' + (codigoActual || '')).then(r => r.json()).then(mensajes => {
+            var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div class="msg-cliente"><div>' + m.mensaje + '</div></div>'; if (m.respuesta) html += '<div class="msg-respuesta"><div>' + m.respuesta + '</div></div>'; } });
+            document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666;">No hay mensajes aún</p>';
+        });
     }
+    function enviarMensaje() {
+        var mensaje = document.getElementById('chatInput').value.trim(); if (!mensaje) return;
+        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:codigoActual, telefono:telefonoActual, mensaje:mensaje}) }).then(function() { document.getElementById('chatInput').value = ''; cargarMensajes(); });
+    }
+    function enviarPregunta(pregunta) { document.getElementById('chatInput').value = pregunta; enviarMensaje(); }
 </script>
 </body>
 </html>

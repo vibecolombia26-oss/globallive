@@ -98,15 +98,25 @@
 <!-- CHAT FLOTANTE -->
 <div id="chatFloating" style="position:fixed; bottom:20px; right:20px; z-index:999;">
     <button onclick="toggleChat()" style="background:#4CAF50; color:#000; border:none; width:60px; height:60px; border-radius:50%; font-size:1.5rem; cursor:pointer; box-shadow:0 4px 20px rgba(0,0,0,0.5);">💬</button>
-    <div id="chatBox" style="display:none; position:absolute; bottom:70px; right:0; width:350px; background:#1a1a1a; border:1px solid #4CAF50; border-radius:16px; padding:20px; max-height:400px; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="color:#4CAF50; margin:0;">💬 Consulta tu pedido</h3>
-            <button onclick="toggleChat()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;">✕</button>
+    <div id="chatBox" style="display:none; position:absolute; bottom:70px; right:0; width:380px; background:#1a1a1a; border:1px solid #4CAF50; border-radius:16px; overflow:hidden;">
+        <div style="background:#4CAF50; color:#000; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1rem;">💬 GlobalLive</h3>
+            <button onclick="toggleChat()" style="background:none; border:none; color:#000; font-size:1.2rem; cursor:pointer;">✕</button>
         </div>
-        <p style="color:#888; font-size:0.8rem; margin-bottom:10px;">Ingresa tu código o celular para ver el estado y chatear</p>
-        <input type="text" id="chatCodigoInput" placeholder="Código o celular..." style="width:100%; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; margin-bottom:10px;">
-        <button onclick="buscarDesdeChat()" style="width:100%; padding:10px; background:#4CAF50; color:#000; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Consultar</button>
-        <div id="chatResultado" style="margin-top:10px; font-size:0.8rem;"></div>
+        <div id="chatLogin" style="padding:20px;">
+            <p style="color:#888; font-size:0.8rem; margin-bottom:10px;">Ingresa tu código de seguimiento o celular</p>
+            <input type="text" id="chatCodigoInput" placeholder="Código o celular..." style="width:100%; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff; margin-bottom:10px;">
+            <button onclick="iniciarChat()" style="width:100%; padding:10px; background:#4CAF50; color:#000; border:none; border-radius:8px; cursor:pointer; font-weight:600;">Ver mi pedido</button>
+            <div id="chatError" style="color:#ff4444; font-size:0.75rem; margin-top:8px;"></div>
+        </div>
+        <div id="chatContent" style="display:none; flex-direction:column; height:400px;">
+            <div id="chatPedidoInfo" style="padding:12px; background:rgba(76,175,80,0.1); border-bottom:1px solid #333; font-size:0.8rem;"></div>
+            <div id="chatMensajes" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:8px;"></div>
+            <div style="padding:12px; border-top:1px solid #333; display:flex; gap:8px;">
+                <input type="text" id="chatMensajeInput" placeholder="Escribe..." style="flex:1; padding:10px; background:#111; border:1px solid #333; border-radius:8px; color:#fff;">
+                <button onclick="enviarMensajeChat()" style="background:#4CAF50; color:#000; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:600;">Enviar</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -117,84 +127,43 @@
         precioTexto = precioTexto.replace('$', '').replace(/\./g, '').replace(/,/g, '').trim();
         precioBase = parseInt(precioTexto) || 0;
     };
-
-    function cambiarCantidad(delta) {
-        const input = document.getElementById('cantidad');
-        let val = parseInt(input.value) || 1;
-        val = Math.max(1, val + delta);
-        input.value = val;
-        actualizarSubtotal();
-    }
-
-    function actualizarSubtotal() {
-        const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        const subtotal = precioBase * cantidad;
-        document.getElementById('subtotalDisplay').innerHTML = '= $' + subtotal.toLocaleString('es-CO');
-    }
-
+    function cambiarCantidad(delta) { const input = document.getElementById('cantidad'); let val = parseInt(input.value) || 1; val = Math.max(1, val + delta); input.value = val; actualizarSubtotal(); }
+    function actualizarSubtotal() { const cantidad = parseInt(document.getElementById('cantidad').value) || 1; const subtotal = precioBase * cantidad; document.getElementById('subtotalDisplay').innerHTML = '= $' + subtotal.toLocaleString('es-CO'); }
     function agregarAlCarrito() {
-        const nombre = document.querySelector('.nombre').textContent.trim();
-        const imagen = document.getElementById('imgPrincipal')?.src || '';
-        const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
-        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '' });
-        localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
-        const btn = document.querySelector('.btn-carrito');
-        btn.textContent = '✓ Agregado';
-        setTimeout(() => {
-            if (confirm('¿Ver carrito?')) window.location.href = '/carrito';
-            else btn.textContent = 'Agregar al carrito';
-        }, 500);
+        const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '' }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
+        const btn = document.querySelector('.btn-carrito'); btn.textContent = '✓ Agregado';
+        setTimeout(() => { if (confirm('¿Ver carrito?')) window.location.href = '/carrito'; else btn.textContent = 'Agregar al carrito'; }, 500);
     }
-
     function comprarContraEntrega() {
-        const nombre = document.querySelector('.nombre').textContent.trim();
-        const imagen = document.getElementById('imgPrincipal')?.src || '';
-        const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || [];
-        carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '', contraentrega: true });
-        localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
+        const nombre = document.querySelector('.nombre').textContent.trim(); const imagen = document.getElementById('imgPrincipal')?.src || ''; const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+        let carrito = JSON.parse(localStorage.getItem('carritoVibeColombia')) || []; carrito.push({ nombre, precio: precioBase, imagen, cantidad, color: '', talla: '', contraentrega: true }); localStorage.setItem('carritoVibeColombia', JSON.stringify(carrito));
         window.location.href = '/carrito';
     }
 
-    function toggleChat() {
-        var box = document.getElementById('chatBox');
-        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    var chatCodigo = '';
+    function toggleChat() { var box = document.getElementById('chatBox'); box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
+    function iniciarChat() {
+        var codigo = document.getElementById('chatCodigoInput').value.trim(); if (!codigo) return; document.getElementById('chatError').textContent = '';
+        fetch('/api/pedido/' + codigo).then(r => r.json()).then(data => {
+            if (data.error) { document.getElementById('chatError').textContent = data.error; }
+            else { chatCodigo = data.codigo; document.getElementById('chatLogin').style.display = 'none'; document.getElementById('chatContent').style.display = 'flex'; document.getElementById('chatPedidoInfo').innerHTML = '<strong style="color:#4CAF50;">📦 ' + data.codigo + '</strong> | Estado: ' + data.estado + (data.transportadora ? ' | 🚚 ' + data.transportadora + ' - ' + data.numeroGuia : ''); cargarMensajesChat(); }
+        });
     }
-
-    function buscarDesdeChat() {
-        var codigo = document.getElementById('chatCodigoInput').value.trim();
-        if (!codigo) return;
-        fetch('/api/pedido/' + codigo)
-            .then(r => r.json())
-            .then(data => {
-                var html = '';
-                if (data.error) {
-                    html = '<p style="color:#ff4444;">' + data.error + '</p>';
-                } else {
-                    html = '<div style="background:#111; padding:10px; border-radius:8px;">';
-                    html += '<p style="color:#4CAF50;">📦 ' + data.codigo + '</p>';
-                    html += '<p>Estado: <strong>' + data.estado + '</strong></p>';
-                    html += '<p style="color:#888; font-size:0.75rem;">' + data.productos + '</p>';
-                    if (data.transportadora) html += '<p>🚚 ' + data.transportadora + ' - Guía: ' + data.numeroGuia + '</p>';
-                    html += '</div>';
-                    html += '<p style="margin-top:10px;"><a href="/seguimiento" style="color:#4CAF50;">Ver más y chatear →</a></p>';
-                }
-                document.getElementById('chatResultado').innerHTML = html;
-            });
+    function cargarMensajesChat() {
+        fetch('/api/chat/mensajes?codigo=' + chatCodigo).then(r => r.json()).then(mensajes => {
+            var html = ''; mensajes.forEach(function(m) { if (m.esCliente) { html += '<div style="align-self:flex-end; background:#4CAF50; color:#000; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.mensaje + '</div>'; if (m.respuesta) html += '<div style="align-self:flex-start; background:#333; color:#fff; padding:8px 12px; border-radius:12px; max-width:80%; font-size:0.85rem;">' + m.respuesta + '</div>'; } });
+            document.getElementById('chatMensajes').innerHTML = html || '<p style="color:#666; text-align:center;">Envía un mensaje para recibir ayuda</p>'; document.getElementById('chatMensajes').scrollTop = document.getElementById('chatMensajes').scrollHeight;
+        });
+    }
+    function enviarMensajeChat() {
+        var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return;
+        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:'', mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); });
     }
 
     actualizarSubtotal();
-
-    const bg = document.getElementById('bgAnimado');
-    const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
-    for (let i = 0; i < 20; i++) {
-        const el = document.createElement('div');
-        el.className = 'molecula';
-        el.textContent = iconos[Math.floor(Math.random() * iconos.length)];
-        el.style.cssText = 'left:'+Math.random()*95+'%;font-size:'+(Math.random()*2+1)+'rem;animation-duration:'+(Math.random()*20+15)+'s;animation-delay:'+Math.random()*10+'s;';
-        bg.appendChild(el);
-    }
+    const bg = document.getElementById('bgAnimado'); const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
+    for (let i = 0; i < 20; i++) { const el = document.createElement('div'); el.className = 'molecula'; el.textContent = iconos[Math.floor(Math.random()*iconos.length)]; el.style.cssText = 'left:'+Math.random()*95+'%;font-size:'+(Math.random()*2+1)+'rem;animation-duration:'+(Math.random()*20+15)+'s;animation-delay:'+Math.random()*10+'s;'; bg.appendChild(el); }
 </script>
 </body>
 </html>
