@@ -60,7 +60,7 @@ public class AdminController {
         return "admin-chats";
     }
 
-    @PostMapping("/responder/{id}")
+    @GetMapping("/responder/{id}")
     public String responder(@PathVariable Long id, @RequestParam String key, @RequestParam String respuesta) {
         if (!adminPassword.equals(key)) return "redirect:/admin/login";
         Mensaje msg = mensajeRepository.findById(id).orElse(null);
