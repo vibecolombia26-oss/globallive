@@ -94,4 +94,23 @@ public class PedidoController {
     public List<Mensaje> obtenerTodosMensajes() {
         return mensajeRepository.findAll();
     }
+    @GetMapping("/api/chat/fix-telefonos")
+    @ResponseBody
+    public String fixTelefonos() {
+        List<Mensaje> mensajes = mensajeRepository.findAll();
+        int count = 0;
+        for (Mensaje m : mensajes) {
+            if (m.getTelefono() == null || m.getTelefono().isEmpty()) {
+                Pedido p = pedidoRepository.findAll().stream()
+                        .filter(ped -> ped.getCodigo().equals(m.getCodigoPedido()))
+                        .findFirst().orElse(null);
+                if (p != null && p.getTelefono() != null && !p.getTelefono().isEmpty()) {
+                    m.setTelefono(p.getTelefono());
+                    mensajeRepository.save(m);
+                    count++;
+                }
+            }
+        }
+        return "OK - " + count + " mensajes actualizados de " + mensajes.size();
+    }
 }
