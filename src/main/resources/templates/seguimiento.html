@@ -70,7 +70,7 @@
     function buscarPedido() {
         var codigo = document.getElementById('codigoInput').value.trim();
         if (!codigo) { document.getElementById('errorMsg').textContent = 'Ingresa un código o teléfono'; return; }
-        var esTelefono = codigo.replace(/[^0-9]/g, '').length >= 10;
+        var esTelefono = codigo.replace(/[^0-9]/g, '').length >= 10 && !codigo.toUpperCase().startsWith('GL-');
         if (esTelefono) {
             telefonoActual = codigo.replace(/[^0-9]/g, '');
             fetch('/api/chat/mensajes?telefono=' + telefonoActual).then(r => r.json()).then(mensajes => {
