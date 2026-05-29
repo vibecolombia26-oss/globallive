@@ -51,7 +51,6 @@
                 var html = '';
                 for (var codigo in agrupados) {
                     var msgs = agrupados[codigo];
-                    var ultimo = msgs[msgs.length - 1];
                     var sinResponder = msgs.filter(function(m) { return m.esCliente && !m.respuesta; }).length;
 
                     html += '<div class="chat-card">';
@@ -68,7 +67,7 @@
                     html += '</div>';
                     if (sinResponder > 0) {
                         html += '<div class="responder-form">';
-                        html += '<input type="text" id="resp_' + msgs[0].id + '" placeholder="Escribe una respuesta...">';
+                        html += '<input type="text" id="resp_' + msgs[0].id + '" placeholder="Escribe una respuesta..." autocomplete="off">';
                         html += '<button onclick="responder(' + msgs[0].id + ')">Enviar</button>';
                         html += '</div>';
                     }
@@ -80,6 +79,7 @@
 
     function responder(msgId) {
         var input = document.getElementById('resp_' + msgId);
+        if (!input) return;
         var respuesta = input.value.trim();
         if (!respuesta) return;
 
@@ -91,13 +91,19 @@
             method: 'POST',
             body: formData
         }).then(function() {
-            input.value = '';
             cargarChats();
         });
     }
 
+    // Cargar al inicio
     cargarChats();
-    setInterval(cargarChats, 3000);
+
+    // Refrescar cada 5 segundos, pero NO si hay un input activo
+    setInterval(function() {
+        if (document.activeElement && document.activeElement.tagName !== 'INPUT') {
+            cargarChats();
+        }
+    }, 5000);
 </script>
 </body>
 </html>
