@@ -83,11 +83,17 @@
         var respuesta = input.value.trim();
         if (!respuesta) return;
 
-        fetch('/admin/responder/' + msgId + '?key=' + key + '&respuesta=' + encodeURIComponent(respuesta))
-            .then(function() {
-                input.value = '';
-                cargarChats();
-            });
+        var formData = new FormData();
+        formData.append('key', key);
+        formData.append('respuesta', respuesta);
+
+        fetch('/admin/responder/' + msgId, {
+            method: 'POST',
+            body: formData
+        }).then(function() {
+            input.value = '';
+            cargarChats();
+        });
     }
 
     cargarChats();
