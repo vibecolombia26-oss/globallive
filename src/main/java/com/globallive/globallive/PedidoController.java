@@ -64,6 +64,28 @@ public class PedidoController {
         return response;
     }
 
+    @GetMapping("/api/pedido/telefono/{telefono}")
+    @ResponseBody
+    public Map<String, Object> buscarPedidoPorTelefono(@PathVariable String telefono) {
+        Pedido pedido = pedidoRepository.findAll().stream()
+                .filter(p -> telefono.equals(p.getTelefono()))
+                .findFirst().orElse(null);
+
+        Map<String, Object> response = new HashMap<>();
+        if (pedido == null) {
+            response.put("error", "Pedido no encontrado");
+        } else {
+            response.put("codigo", pedido.getCodigo());
+            response.put("estado", pedido.getEstado());
+            response.put("productos", pedido.getProductos());
+            response.put("total", pedido.getTotal());
+            response.put("transportadora", pedido.getTransportadora());
+            response.put("numeroGuia", pedido.getNumeroGuia());
+            response.put("telefono", pedido.getTelefono());
+        }
+        return response;
+    }
+
     @PostMapping("/api/chat/enviar")
     @ResponseBody
     public Map<String, String> enviarMensaje(@RequestBody Map<String, String> body) {
@@ -90,11 +112,13 @@ public class PedidoController {
         }
         return List.of();
     }
+
     @GetMapping("/api/chat/todos")
     @ResponseBody
     public List<Mensaje> obtenerTodosMensajes() {
         return mensajeRepository.findAll();
     }
+
     @GetMapping("/api/chat/fix-telefonos")
     @ResponseBody
     public String fixTelefonos() {

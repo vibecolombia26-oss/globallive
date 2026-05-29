@@ -80,10 +80,15 @@
                 var telefono = codigo.replace(/[^0-9]/g, '');
                 if (telefono.length >= 10) {
                     telefonoActual = telefono;
-                    fetch('/api/chat/mensajes?telefono=' + telefono).then(r => r.json()).then(mensajes => {
-                        document.getElementById('resultado').style.display = 'none';
-                        if (mensajes.length > 0) { codigoActual = mensajes[0].codigoPedido; document.getElementById('errorMsg').textContent = ''; document.getElementById('chatContainer').style.display = 'block'; cargarMensajes(); }
-                        else { document.getElementById('errorMsg').textContent = 'No se encontró el pedido.'; document.getElementById('chatContainer').style.display = 'none'; }
+                    fetch('/api/pedido/telefono/' + telefono).then(r => r.json()).then(data2 => {
+                        if (!data2.error) {
+                            codigoActual = data2.codigo; document.getElementById('errorMsg').textContent = ''; document.getElementById('resultado').style.display = 'block';
+                            document.getElementById('rCodigo').textContent = data2.codigo; document.getElementById('rEstado').innerHTML = '<span class="estado estado-pendiente">' + data2.estado + '</span>';
+                            document.getElementById('rProductos').textContent = data2.productos;
+                            if (data2.transportadora) { document.getElementById('rTransportadora').textContent = data2.transportadora; document.getElementById('rGuia').textContent = data2.numeroGuia || 'Pendiente'; document.getElementById('infoEnvio').style.display = 'block'; }
+                            else { document.getElementById('infoEnvio').style.display = 'none'; }
+                            document.getElementById('chatContainer').style.display = 'block'; cargarMensajes();
+                        } else { document.getElementById('errorMsg').textContent = 'No se encontró el pedido.'; document.getElementById('chatContainer').style.display = 'none'; }
                     });
                 } else { document.getElementById('errorMsg').textContent = 'No se encontró el pedido.'; document.getElementById('resultado').style.display = 'none'; document.getElementById('chatContainer').style.display = 'none'; }
             }
