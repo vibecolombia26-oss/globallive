@@ -104,7 +104,7 @@
             else {
                 var telefono = codigo.replace(/[^0-9]/g, '');
                 if (telefono.length >= 10) {
-                    fetch('/api/chat/mensajes?telefono=' + telefono).then(r => r.json()).then(mensajes => {
+                    fetch('/api/pedido/telefono/' + telefono).then(r => r.json()).then(mensajes => {
                         if (mensajes.length > 0) { chatCodigo = mensajes[0].codigoPedido; fetch('/api/pedido/' + chatCodigo).then(r => r.json()).then(d => { if (!d.error) mostrarChatInfo(d); }); }
                         else { document.getElementById('chatError').textContent = 'No se encontró el pedido.'; }
                     });
@@ -126,7 +126,7 @@
     function enviarMensajeChat() {
         var mensaje = document.getElementById('chatMensajeInput').value.trim(); if (!mensaje) return;
         var telefono = document.getElementById('chatCodigoInput').value;
-        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:telefono, mensaje:mensaje}) }).then(function() { document.getElementById('chatMensajeInput').value = ''; cargarMensajesChat(); });
+        fetch('/api/chat/enviar', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({codigo:chatCodigo, telefono:telefono, mensaje:mensaje}) })
     }
     const bg = document.getElementById('bgAnimado'); const iconos = ['🧬','💊','🌿','🩺','🧪','💚','🫒','🍃','✨','🧘'];
     for (let i = 0; i < 30; i++) { const el = document.createElement('div'); el.className = 'molecula'; el.textContent = iconos[Math.floor(Math.random()*iconos.length)]; el.style.cssText = 'left:'+Math.random()*95+'%;font-size:'+(Math.random()*2+1)+'rem;animation-duration:'+(Math.random()*20+15)+'s;animation-delay:'+Math.random()*10+'s;'; bg.appendChild(el); }

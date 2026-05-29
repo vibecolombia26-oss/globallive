@@ -126,7 +126,7 @@
             else {
                 var telefono = codigo.replace(/[^0-9]/g, '');
                 if (telefono.length >= 10) {
-                    fetch('/api/chat/mensajes?telefono=' + telefono).then(r => r.json()).then(mensajes => {
+                    fetch('/api/pedido/telefono/' + telefono).then(r => r.json()).then(mensajes => {
                         if (mensajes.length > 0) { chatCodigo = mensajes[0].codigoPedido; fetch('/api/pedido/' + chatCodigo).then(r => r.json()).then(d => { if (!d.error) mostrarChatInfo(d); }); }
                         else { document.getElementById('chatError').textContent = 'No se encontró el pedido.'; }
                     });
